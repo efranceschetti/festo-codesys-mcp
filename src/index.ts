@@ -33,7 +33,7 @@ import { setLoggerServer, log } from './utils/logger.js';
 import { buildServerInstructions } from './server-instructions.js';
 
 /** Single source of truth for the server version (keep in sync with package.json). */
-const SERVER_VERSION = '1.0.0';
+const SERVER_VERSION = '1.0.1';
 
 async function main() {
   // Optional tool families are gated by environment variables. Compute the

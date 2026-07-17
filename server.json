@@ -3,12 +3,12 @@
   "name": "io.github.efranceschetti/festo-codesys-mcp",
   "description": "MCP server for Festo/CODESYS PLC engineering — generates IEC 61131-3 Structured Text and validated PLCopen XML, with an embedded knowledge base (27 topics, 19 manuals, BM25 search) and a 38-block ST library.",
   "status": "active",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packages": [
     {
       "registry_name": "npm",
       "name": "festo-codesys-mcp",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "runtime_hint": "npx",
       "environment_variables": [
         {
