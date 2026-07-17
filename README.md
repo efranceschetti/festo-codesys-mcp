@@ -2,6 +2,8 @@
 
 **An MCP server that turns AI assistants into competent Festo/CODESYS PLC engineers.**
 
+[![npm version](https://img.shields.io/npm/v/festo-codesys-mcp?logo=npm&color=cb3837)](https://www.npmjs.com/package/festo-codesys-mcp)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-listed-6E56CF)](https://registry.modelcontextprotocol.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node >= 20](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](package.json)
 [![PLCopen TC6 XML](https://img.shields.io/badge/PLCopen-TC6%20v2.00-orange)](https://plcopen.org/)
