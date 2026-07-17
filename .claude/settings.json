@@ -1,0 +1,84 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__festo-codesys-mcp__plc_lookup",
+      "mcp__festo-codesys-mcp__plc_knowledge",
+      "mcp__festo-codesys-mcp__plc_library",
+      "mcp__festo-codesys-mcp__plc_validate",
+      "mcp__festo-codesys-mcp__validate_plcopen_xml",
+      "mcp__festo-codesys-mcp__validate_plcopen_xsd",
+      "mcp__festo-codesys-mcp__validate_plcopen_semantic",
+      "mcp__festo-codesys-mcp__st_symbols",
+      "mcp__festo-codesys-mcp__st_find_references",
+      "mcp__festo-codesys-mcp__debug_plc_code",
+      "mcp__festo-codesys-mcp__review_st_code",
+      "mcp__festo-codesys-mcp__explain_error_code",
+
+      "Bash(npm run build)",
+      "Bash(npm run build:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(npm ci)",
+      "Bash(git status)",
+      "Bash(git status:*)",
+      "Bash(git diff)",
+      "Bash(git diff:*)",
+      "Bash(git log)",
+      "Bash(git log:*)",
+      "Bash(git branch)",
+      "Bash(git branch:*)",
+      "Bash(git show)",
+      "Bash(git show:*)",
+      "Bash(node --check build/index.js)",
+      "Bash(node --version)",
+      "Bash(npm --version)"
+    ],
+    "ask": [
+      "mcp__festo-codesys-mcp__create_function_block",
+      "mcp__festo-codesys-mcp__create_program",
+      "mcp__festo-codesys-mcp__create_data_type",
+      "mcp__festo-codesys-mcp__create_gvl",
+      "mcp__festo-codesys-mcp__create_project_structure",
+      "mcp__festo-codesys-mcp__generate_plcopen_xml",
+
+      "Bash(npm run dev)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node .claude/statusline.mjs"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/session-start.mjs" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/plc-guard-st.mjs" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/stop-summary.mjs" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "functionBlock": "FB_",
+  "program": "PRG_",
+  "function": "FC_",
+  "enum": "E_",
+  "struct": "ST_",
+  "interface": "I_",
+  "gvl": "GVL_",
+  "union": "U_",
+  "alias": "T_"
+}

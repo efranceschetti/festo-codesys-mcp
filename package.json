@@ -1,0 +1,89 @@
+{
+  "name": "festo-codesys-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Festo/CODESYS PLC engineering — IEC 61131-3 ST generation, validated PLCopen XML, embedded knowledge base (27 topics, 19 manuals, BM25 search), 38-block ST library, optional CODESYS IDE driving and hardware commissioning",
+  "mcpName": "io.github.efranceschetti/festo-codesys-mcp",
+  "type": "module",
+  "main": "build/index.js",
+  "exports": {
+    ".": {
+      "default": "./build/index.js"
+    }
+  },
+  "bin": {
+    "festo-codesys-mcp": "build/index.js"
+  },
+  "files": [
+    "build/**/*.js",
+    "build/**/*.d.ts",
+    "!build/__tests__/**",
+    "data/**/*.json",
+    "knowledge/**/*",
+    "!knowledge/bm25_index.json",
+    "python/wrappers/**",
+    "python/lib/**",
+    "python/pyproject.toml",
+    "README.md",
+    "CLAUDE.md",
+    "LICENSE",
+    "NOTICE.md",
+    "server.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0",
+    "start": "node build/index.js",
+    "dev": "tsx src/index.ts",
+    "prepare": "npm run build",
+    "test": "node --test build/__tests__/*.test.js",
+    "test:coverage": "c8 --reporter=text --reporter=lcov node --test build/__tests__/*.test.js",
+    "test:bench": "node scripts/bench.mjs",
+    "inspect": "npx @modelcontextprotocol/inspector node build/index.js",
+    "python:install": "cd python && uv sync",
+    "python:test": "cd python && uv run pytest -q",
+    "test:e2e:codesys": "node scripts/e2e-codesys.mjs",
+    "test:e2e:cpx": "node scripts/e2e-cpx.mjs",
+    "test:e2e:edcon": "node scripts/e2e-edcon.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "chokidar": "^5.0.0",
+    "fast-xml-parser": "^5.7.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "^0.21.2",
+    "@types/node": "^25.6.2",
+    "c8": "^10.1.3",
+    "eslint": "^10.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2"
+  },
+  "keywords": [
+    "mcp",
+    "codesys",
+    "plcopen",
+    "plc",
+    "iec-61131-3",
+    "structured-text",
+    "festo",
+    "cpx",
+    "ethercat",
+    "cia-402",
+    "automation"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "author": "Eduardo Franceschetti (E3 Engenharia Industrial)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efranceschetti/festo-codesys-mcp.git"
+  },
+  "homepage": "https://github.com/efranceschetti/festo-codesys-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/efranceschetti/festo-codesys-mcp/issues"
+  }
+}

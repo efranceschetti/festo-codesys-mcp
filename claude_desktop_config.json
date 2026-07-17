@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "festo-codesys-mcp": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "festo-codesys-mcp"]
+    }
+  }
+}

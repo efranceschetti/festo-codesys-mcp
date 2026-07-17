@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP21" creationDateTime="<NORMALIZED>" />
+  <contentHeader name="PRG_Main" modificationDateTime="<NORMALIZED>">
+    <coordinateInfo>
+      <fbd><scaling x="1" y="1" /></fbd>
+      <ld><scaling x="1" y="1" /></ld>
+      <sfc><scaling x="1" y="1" /></sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="PRG_Main" pouType="program">
+        <interface>
+        <localVars>
+          <variable name="fbWorker">
+            <type><derived name="FB_StateMachine" /></type>
+            <documentation><xhtml xmlns="http://www.w3.org/1999/xhtml">Cycle worker</xhtml></documentation>
+          </variable>
+          <variable name="bStart">
+            <type><BOOL /></type>
+            <documentation><xhtml xmlns="http://www.w3.org/1999/xhtml">Operator start button</xhtml></documentation>
+          </variable>
+        </localVars>
+      </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"><![CDATA[fbWorker(
+    bExecute := bStart,
+);
+
+IF fbWorker.bDone THEN
+    bStart := FALSE;
+END_IF]]></xhtml>
+          </ST>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+</project>
