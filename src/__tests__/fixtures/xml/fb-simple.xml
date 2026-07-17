@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP21" creationDateTime="<NORMALIZED>" />
+  <contentHeader name="FB_Simple" modificationDateTime="<NORMALIZED>">
+    <coordinateInfo>
+      <fbd><scaling x="1" y="1" /></fbd>
+      <ld><scaling x="1" y="1" /></ld>
+      <sfc><scaling x="1" y="1" /></sfc>
+    </coordinateInfo>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="FB_Simple" pouType="functionBlock">
+        <interface>
+        <inputVars>
+          <variable name="bEnable">
+            <type><BOOL /></type>
+            <documentation><xhtml xmlns="http://www.w3.org/1999/xhtml">Enable command</xhtml></documentation>
+          </variable>
+        </inputVars>
+        <outputVars>
+          <variable name="bDone">
+            <type><BOOL /></type>
+            <documentation><xhtml xmlns="http://www.w3.org/1999/xhtml">Done flag</xhtml></documentation>
+          </variable>
+        </outputVars>
+      </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml"><![CDATA[bDone := bEnable;]]></xhtml>
+          </ST>
+        </body>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+</project>

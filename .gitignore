@@ -1,0 +1,28 @@
+node_modules/
+build/
+coverage/
+*.js.map
+*.d.ts
+!src/**/*.d.ts
+.env
+.DS_Store
+# Raw HTML dumps from docs-harvest/harvest.py (regenerable)
+docs-harvest/_raw/
+# Claude Code: settings local-only (config por máquina)
+.claude/settings.local.json
+# BM25 index é regenerável a partir dos .md em knowledge/
+# (saveIndex em knowledge-indexer.ts) — não versionar
+knowledge/bm25_index.json
+# Conteúdo gated extraído de pacotes Festo customer-portal — nunca redistribuir.
+# Cada usuário regenera localmente via scripts/extract-festo-package.ts a partir
+# dos .package que ele próprio baixou do portal.
+knowledge/external/
+
+# Python venv pros wrappers Festo (cpx-io + edcon) — regenerado via
+# `npm run python:install` (uv sync). Source: python/pyproject.toml + uv.lock.
+python/.venv/
+python/**/__pycache__/
+python/**/*.pyc
+
+# truST LSP index cache — regenerado pela extensao VS Code do truST ao abrir o repo.
+.trust-lsp/

@@ -1,0 +1,17 @@
+{
+  "states": {
+    "0": { "name": "IDLE", "description": "Waiting for trigger, no operation active" },
+    "10": { "name": "INIT", "description": "Initialize hardware, load configuration" },
+    "20": { "name": "READY", "description": "Initialized and ready for operation" },
+    "30": { "name": "RUNNING", "description": "Main operation in progress" },
+    "40": { "name": "PAUSED", "description": "Operation temporarily suspended" },
+    "50": { "name": "STOPPING", "description": "Controlled shutdown sequence" },
+    "60": { "name": "HOMING", "description": "Axis homing sequence" },
+    "70": { "name": "POSITIONING", "description": "Move to target position" },
+    "80": { "name": "HOLDING", "description": "Maintaining position/state" },
+    "90": { "name": "DONE", "description": "Operation completed successfully" },
+    "99": { "name": "ERROR", "description": "Fault detected, requires acknowledgment" }
+  },
+  "required": ["0", "90", "99"],
+  "convention": "nState : INT — 0=IDLE, 10-80=work, 90=DONE, 99=ERROR"
+}

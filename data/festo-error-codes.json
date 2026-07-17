@@ -1,0 +1,41 @@
+{
+  "cia402": {
+    "0x0000": { "message": "No error", "recovery": "None required" },
+    "0x2310": { "message": "Continuous over current (device internal)", "recovery": "Check wiring, reduce load, verify motor parameters" },
+    "0x2320": { "message": "Short circuit (device internal)", "recovery": "Check motor wiring for short circuits" },
+    "0x3110": { "message": "Overvoltage on mains", "recovery": "Check supply voltage, add braking resistor if needed" },
+    "0x3120": { "message": "Overvoltage on DC link", "recovery": "Reduce deceleration ramp, add braking resistor" },
+    "0x3210": { "message": "Undervoltage on mains", "recovery": "Check supply voltage, verify power supply capacity" },
+    "0x3220": { "message": "Undervoltage on DC link", "recovery": "Check 24V supply, verify cable cross-section" },
+    "0x4210": { "message": "Excess temperature drive", "recovery": "Improve ventilation, reduce duty cycle, check ambient temp" },
+    "0x4310": { "message": "Excess temperature motor", "recovery": "Check motor thermal protection, reduce load" },
+    "0x5113": { "message": "Supply voltage too low (logic)", "recovery": "Check 24V logic supply" },
+    "0x5280": { "message": "Safety function activated", "recovery": "Reset safety input (STO), check emergency stop chain" },
+    "0x5441": { "message": "Motor without hall sensor", "recovery": "Configure motor parameters for sensorless operation" },
+    "0x6010": { "message": "Software error (internal)", "recovery": "Power cycle, update firmware if persistent" },
+    "0x7121": { "message": "Motor blocked (stall)", "recovery": "Check mechanics, reduce load, verify current limits" },
+    "0x7300": { "message": "Sensor error", "recovery": "Check encoder/resolver wiring and alignment" },
+    "0x7500": { "message": "Communication lost (fieldbus)", "recovery": "Check EtherCAT cabling, verify cycle time settings" },
+    "0x7510": { "message": "CAN overrun", "recovery": "Reduce CAN bus load, check baud rate" },
+    "0x8100": { "message": "CAN message lost", "recovery": "Check CAN wiring and termination resistors" },
+    "0x8200": { "message": "Protocol error (EtherCAT)", "recovery": "Check EtherCAT topology, verify master settings" },
+    "0x8210": { "message": "PDO not processed due to length error", "recovery": "Verify PDO mapping matches device configuration" },
+    "0x8611": { "message": "Following error (position lag too large)", "recovery": "Tune position controller, reduce velocity, check mechanics" },
+    "0x8612": { "message": "Position limit exceeded", "recovery": "Check software limits, verify homing was successful" },
+    "0xFF01": { "message": "Positive limit switch activated", "recovery": "Jog in negative direction, check limit switch" },
+    "0xFF02": { "message": "Negative limit switch activated", "recovery": "Jog in positive direction, check limit switch" }
+  },
+  "festo_ptp": {
+    "4357": { "message": "MC error — axis not referenced (not homed)", "recovery": "Execute MC_Home_Festo before MC_MoveAbsolute" },
+    "4358": { "message": "MC error — axis in error state", "recovery": "Call MC_Reset_Festo, then re-enable with MC_Power_Festo" },
+    "4361": { "message": "MC error — software limit exceeded", "recovery": "Check position target is within SW limits" },
+    "4365": { "message": "MC error — command not allowed in current state", "recovery": "Check CiA 402 state machine, ensure axis is Operation Enabled" }
+  },
+  "codesys": {
+    "3500": { "message": "License missing or invalid", "recovery": "Check CODESYS license dongle/softkey" },
+    "3501": { "message": "Library not found", "recovery": "Install missing library via Library Manager" },
+    "3700": { "message": "Watchdog triggered — task cycle exceeded", "recovery": "Optimize code, reduce cycle time, check WHILE loops" },
+    "3800": { "message": "Exception — access violation", "recovery": "Check pointer/reference validity, array bounds" },
+    "3801": { "message": "Exception — division by zero", "recovery": "Add zero-check before division operations" }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "triggers": {
+    "bEnable": { "type": "BOOL", "section": "VAR_INPUT", "description": "Continuous enable — FB runs while TRUE" },
+    "bExecute": { "type": "BOOL", "section": "VAR_INPUT", "description": "Edge-triggered — FB runs on rising edge" }
+  },
+  "status": {
+    "bDone": { "type": "BOOL", "section": "VAR_OUTPUT", "description": "Operation completed successfully" },
+    "bBusy": { "type": "BOOL", "section": "VAR_OUTPUT", "description": "Operation in progress" },
+    "bErr": { "type": "BOOL", "section": "VAR_OUTPUT", "description": "Error occurred during operation" },
+    "nErrId": { "type": "UDINT", "section": "VAR_OUTPUT", "description": "Error code (0 = no error)" }
+  },
+  "convention": "bEnable/bExecute IN → bDone/bBusy/bErr/nErrId OUT"
+}

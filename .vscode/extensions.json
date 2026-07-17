@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "anthropic.claude-code",
+    "ControlForgeSystems.controlforge-structured-text",
+    "Serhioromano.vscode-st",
+    "Serpens.structured-text",
+    "DotJoshJohnson.xml",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens"
+  ],
+  "unwantedRecommendations": []
+}

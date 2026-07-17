@@ -1,0 +1,49 @@
+{
+  "files.associations": {
+    "*.st": "structured-text",
+    "*.iecst": "structured-text",
+    "*.TcPOU": "structured-text",
+    "*.TcGVL": "structured-text",
+    "**/*plcopen*.xml": "xml",
+    "**/PLCopen/*.xml": "xml"
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[json]": {
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true
+  },
+  "[markdown]": {
+    "editor.formatOnSave": true
+  },
+  "eslint.validate": ["typescript"],
+  "eslint.useFlatConfig": true,
+  "search.exclude": {
+    "build/**": true,
+    "node_modules/**": true,
+    "knowledge/bm25_index.json": true,
+    "package-lock.json": true
+  },
+  "files.exclude": {
+    "build/**": true,
+    "**/.DS_Store": true
+  },
+  "files.watcherExclude": {
+    "**/build/**": true,
+    "**/node_modules/**": true,
+    "**/knowledge/bm25_index.json": true
+  },
+  "terminal.integrated.env.windows": {
+    "FESTO_MCP_LOG": "info"
+  },
+  "terminal.integrated.env.linux": {
+    "FESTO_MCP_LOG": "info"
+  },
+  "terminal.integrated.env.osx": {
+    "FESTO_MCP_LOG": "info"
+  }
+}
