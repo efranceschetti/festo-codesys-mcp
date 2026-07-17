@@ -1,40 +1,47 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.efranceschetti/festo-codesys-mcp",
-  "description": "MCP server for Festo/CODESYS PLC engineering — generates IEC 61131-3 Structured Text and validated PLCopen XML, with an embedded knowledge base (27 topics, 19 manuals, BM25 search) and a 38-block ST library.",
-  "status": "active",
+  "description": "MCP server for Festo/CODESYS PLCs: IEC 61131-3 ST + validated PLCopen XML generation.",
   "version": "1.0.1",
   "packages": [
     {
-      "registry_name": "npm",
-      "name": "festo-codesys-mcp",
+      "registryType": "npm",
+      "identifier": "festo-codesys-mcp",
       "version": "1.0.1",
-      "runtime_hint": "npx",
-      "environment_variables": [
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
         {
           "name": "FESTO_MCP_CODESYS_PATH",
           "description": "Optional. Absolute path to CODESYS.exe — enables the 12 ide_* tools that drive a live CODESYS V3.5 instance (Windows only).",
-          "is_required": false
+          "isRequired": false,
+          "format": "string"
         },
         {
           "name": "FESTO_MCP_CODESYS_PROFILE",
           "description": "Required when using the ide_* tools. CODESYS profile name exactly as shown in the CODESYS version selector.",
-          "is_required": false
+          "isRequired": false,
+          "format": "string"
         },
         {
           "name": "FESTO_MCP_PYTHON",
-          "description": "Optional. Python interpreter for the XSD/semantic validators and hardware tools (needs lxml; hardware also needs festo-cpx-io / festo-edcon).",
-          "is_required": false
+          "description": "Optional. Python interpreter for the XSD/semantic validators and hardware tools (needs lxml).",
+          "isRequired": false,
+          "format": "string"
         },
         {
           "name": "FESTO_MCP_ENABLE_HARDWARE",
-          "description": "Optional. Set to 1 to enable the cpx_*/edcon_* hardware commissioning tools (bench use only — they write directly to Festo devices).",
-          "is_required": false
+          "description": "Optional. Set to 1 to enable the cpx_*/edcon_* hardware commissioning tools (bench use only).",
+          "isRequired": false,
+          "format": "string"
         },
         {
           "name": "FESTO_MCP_ALLOW_OUTSIDE_WORKSPACE",
-          "description": "Optional. Set to 1 to allow file-writing tools to write outside the workspace directory (disabled by default).",
-          "is_required": false
+          "description": "Optional. Set to 1 to allow file-writing tools to write outside the workspace directory.",
+          "isRequired": false,
+          "format": "string"
         }
       ]
     }
