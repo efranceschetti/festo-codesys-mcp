@@ -1,6 +1,6 @@
 {
   "name": "festo-codesys-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for Festo/CODESYS PLC engineering — IEC 61131-3 ST generation, validated PLCopen XML, embedded knowledge base (27 topics, 19 manuals, BM25 search), 38-block ST library, optional CODESYS IDE driving and hardware commissioning",
   "mcpName": "io.github.efranceschetti/festo-codesys-mcp",
   "type": "module",
@@ -23,6 +23,7 @@
     "python/wrappers/**",
     "python/lib/**",
     "python/pyproject.toml",
+    "!python/**/__pycache__/**",
     "README.md",
     "CLAUDE.md",
     "LICENSE",
