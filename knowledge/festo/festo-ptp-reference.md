@@ -740,6 +740,6 @@ Both at 2 ms — synchronization is critical for motion control. The EtherCAT_Ta
 
 ## Example: PLCopen XML — CMMT-AS-MP-S1
 
-Reference example bundled in MCP at `knowledge/plcopen/Festo_PtP_Example_CMMT-AS-MP-S1.xml`. Demonstrates instantiation and cyclic call of all 24 MC_*_Festo FBs on a single CMMT-AS-MP-S1 axis, with the recommended task config and library set above.
+Festo publishes an official PLCopen XML example, `Festo_PtP_Example_CMMT-AS-MP-S1.xml`, which demonstrates instantiation and cyclic call of all 24 MC_*_Festo FBs on a single CMMT-AS-MP-S1 axis, with the recommended task config and library set above. It is **not redistributed here** — it is Festo's own copyrighted material; obtain it from Festo Support. What is summarised above are the library versions it pins, with attribution.
 
 To import in CODESYS: `Project > Import PLCopen XML > select file`.

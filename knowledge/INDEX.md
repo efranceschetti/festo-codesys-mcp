@@ -38,7 +38,7 @@ NOTE: language-agnostic method — count scans, not milliseconds; assert the phy
 ### Motion Control / Servo / EtherCAT
 REQUIRED: `festo-ptp`, `ethercat-cia402`
 OPTIONAL: `motion-patterns`
-REFERENCE EXAMPLE: `plcopen/Festo_PtP_Example_CMMT-AS-MP-S1.xml` (Festo official, v3.5.0.11, dated 2025-11-25)
+REFERENCE EXAMPLE: Festo ships an official PLCopen XML example for the CMMT-AS-MP-S1 (v3.5.0.11). It is NOT redistributed here — get it from Festo Support. The library versions it pins are summarised, with attribution, in `festo-ptp-reference`.
 LIBRARY MANUAL (CMMT-AS): `manuals/hw-cmmt-servo` — MC_*_Festo FBs, step-by-step FAS commissioning, library error codes, FAQ. Use this to PROGRAM via the Festo PtP library.
 PROTOCOL MANUAL (CMMT-AS-S1): `manuals/hw-cmmt-as-s1-reference` — raw CoE objects, bit-by-bit controlword/statusword, STO/SBC S1, internal parameters, ESM/DC, CSP sub-modes, enable sequence without the library. Use this when speaking CiA 402 directly or for STO / deep diagnostics.
 DO NOT USE: library/motion/* (those are for simple motors, not servo)

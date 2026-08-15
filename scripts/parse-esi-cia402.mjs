@@ -165,7 +165,7 @@ for (const file of xmlFiles) {
     lines.push('  - PDO mapping default: 0x1A00 / 0x1600 — what is included');
     lines.push('never_use_when:');
     lines.push('  - working with CPX-E EtherCAT fieldbus coupler (use festo-cpx-e-ec-coe-dictionary)');
-    lines.push('  - need general PtP behavior reference (use festo-point-to-point or festo-ptp-reference)');
+    lines.push('  - need general PtP behavior reference (use festo-ptp-reference)');
     lines.push('  - need CMMT-AS hardware spec (use hw-cmmt-servo)');
     lines.push(`keywords: [${dev.typeText}, CiA 402, EtherCAT, CoE, object dictionary, controlword, statusword, PDO, SDO, drive, servo, MC_Power_Festo, MC_Home_Festo, modes of operation]`);
     lines.push(`source: ESI XML — ${relative(RAW_DIR, file).replace(/\\/g, '/')}`);

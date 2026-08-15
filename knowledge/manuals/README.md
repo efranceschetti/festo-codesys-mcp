@@ -1,30 +1,47 @@
 # Manuals Knowledge Base
 
-> Place your converted PDF manuals here as `.md` files.
+> Notes **written by you** about the hardware you work with. Not a place for vendor PDFs.
 
-## How to Add Manuals
+## ⚠️ Do not transcribe vendor manuals here
 
-1. Convert your PDF manual to Markdown (`.md`) format
-2. Save the file in this `knowledge/manuals/` directory
-3. The FestoCodesysMCP server will **auto-discover** all `.md` files here
-4. Use `plc_knowledge` with action `search` or `list_manuals` to access them
+This directory is indexed and shipped in a **public** repository. Vendor documentation —
+Festo, CODESYS, Fagor, Beckhoff, IEC/PLCopen — is copyrighted, and most of it carries an
+explicit clause against redistribution. Festo's own manuals state that *"duplication or
+reprinting… distribution to third parties can only be made with the express consent of
+Festo SE & Co. KG"*. Converting a PDF to Markdown does not change any of that: it is the
+same text, redistributed.
 
-## Recommended File Naming
+A file here that mirrors a manual chapter by chapter — especially one carrying page
+markers like `<!-- Page 12 -->` — is a transcription, not a note. It does not belong in
+this repo.
 
-Use lowercase with hyphens, descriptive names:
+## What to write instead
 
-| Manual | Suggested Filename |
-| ------ | ------------------ |
-| Festo CPX-E System Manual | `festo-cpx-e-system.md` |
-| Festo CMMT Servo Drive | `festo-cmmt-servo.md` |
-| Festo CDPX Designer Studio | `festo-cdpx-designer-studio.md` |
-| EtherCAT ESI Files Guide | `ethercat-esi-guide.md` |
-| PLCopen Motion Control Part 1 | `plcopen-motion-part1.md` |
-| IEC 61131-3 Reference | `iec-61131-3-reference.md` |
+Write **your own reference**: what you measured, what bit you had to set, which error code
+meant what on the bench, the sequence that actually worked. Cite the manual as a source
+(vendor, document, version, date) so a reader can go find the original.
 
-## Tips for Conversion
+`knowledge/festo/festo-ptp-reference.md` is the shape to copy — it summarises tested
+library versions and attributes them to the official Festo example, without shipping it.
 
-- Focus on the most-consulted sections: parameter tables, state diagrams, error codes
-- Keep tables in Markdown format for structured access
-- Include section headings that match the original chapter structure
-- Code examples should use `iecst` fenced code blocks
+Rule of thumb: **could the vendor publish this page as their own?** If yes, it is a
+transcription — cite it instead.
+
+## How the index works
+
+1. Write your `.md` file in this directory
+2. The server **auto-discovers** every `.md` here (BM25 index, rebuilt on change)
+3. Reach it with `plc_knowledge`, action `search` or `list_manuals`
+
+## File naming
+
+Lowercase with hyphens, descriptive — `festo-cpx-e-notes.md`, `hw-cmmt-servo.md`,
+`ethercat-esi-guide.md`.
+
+## Writing tips
+
+- Lead with what is hard to rediscover: parameter values, state transitions, error codes
+- Keep tables in Markdown so they stay queryable
+- Structure by **the question you had**, not by the vendor's chapter order — that is both
+  more useful and the clearest sign the text is yours
+- Use `iecst` fenced blocks for code
