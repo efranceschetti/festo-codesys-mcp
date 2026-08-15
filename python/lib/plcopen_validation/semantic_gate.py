@@ -85,7 +85,13 @@ def count_st_vars(st_path: Path) -> dict[str, Any]:
     var_names: list[str] = []
     for line in text_clean.splitlines():
         s = line.strip()
-        if re.match(r"^VAR(_\w+)?\s*(CONSTANT|RETAIN|PERSISTENT)?\s*$", s, re.IGNORECASE):
+        # Qualifiers COMBINE: `VAR_GLOBAL PERSISTENT RETAIN` is one block, and IEC 61131-3
+        # allows several of them together. Accepting only one silently dropped the whole
+        # block — and the variables that live there are the RETAIN ones, the state that
+        # survives a power cut. Measured on a real project: 13 variables invisible to the
+        # gate, including part counters and the table-slot tracking.
+        if re.match(r"^VAR(_\w+)?(\s+(CONSTANT|RETAIN|PERSISTENT|NON_RETAIN))*\s*$",
+                    s, re.IGNORECASE):
             in_var_block = True
             continue
         if re.match(r"^END_VAR\s*$", s, re.IGNORECASE):
@@ -204,11 +210,48 @@ def validate_semantic(
     st_files = sorted(source_dir.rglob("*.st"))
     checked = 0
 
+    # Global variable lists live in <globalVars> under <addData>, not in <pous> — so the
+    # POU loop below never saw them. On a real project that left 553 declarations
+    # unchecked, including the HMI<->PLC contract and the physical I/O map (73 vars, 62
+    # of them with an `AT %IX/%QX` address). Those are boundaries: exactly where a lost
+    # or renamed identifier stops raising an error and starts silently returning nothing.
+    xml_gvls: dict[str, set[str]] = {}
+    for el in xml_root.iter():
+        if el.tag == f"{NS}globalVars" and el.get("name"):
+            xml_gvls[el.get("name")] = {
+                v.get("name").lower() for v in el
+                if v.tag == f"{NS}variable" and v.get("name")
+            }
+
     for st in st_files:
         st_counts = count_st_vars(st)
         pou_names = st_counts.get("_pou_names", [])
         if not pou_names:
-            continue  # pure GVL / TYPE-only file
+            # No POU declared: it is a GVL or a TYPE-only file. TYPE files have no
+            # VAR block, so they fall out on their own.
+            nomes = st_counts.get("_var_names") or []
+            if not nomes:
+                continue
+            gvl_xml = xml_gvls.get(st.stem)
+            if gvl_xml is None:
+                errors.append(ValidationError(
+                    line=None, location=st.name, code="GVL_MISSING_IN_XML",
+                    message=(f"'{st.stem}' declares {len(nomes)} global var(s) but there is no "
+                             f"<globalVars name=\"{st.stem}\"> in the XML — CODESYS will not "
+                             f"create the list, and every reference to it breaks"),
+                ))
+                continue
+            faltando = [n for n in nomes if n.lower() not in gvl_xml]
+            if faltando:
+                amostra = ", ".join(faltando[:8])
+                resto = f" (+{len(faltando) - 8})" if len(faltando) > 8 else ""
+                errors.append(ValidationError(
+                    line=None, location=st.name, code="GVL_VARS_MISSING_BY_NAME",
+                    message=(f"{len(faltando)} global var(s) declared in {st.name} are absent "
+                             f"from the XML by name: {amostra}{resto}"),
+                ))
+            checked += 1
+            continue
 
         for pou_name in pou_names:
             if pou_name not in xml_pou_names:
@@ -282,7 +325,7 @@ def validate_semantic(
 
     valid = len(errors) == 0
     if valid:
-        summary = f"{checked}/{checked} POUs match (source vs XML)"
+        summary = f"{checked}/{checked} POUs and GVLs match (source vs XML)"
     else:
         by_code: dict[str, int] = defaultdict(int)
         for e in errors:

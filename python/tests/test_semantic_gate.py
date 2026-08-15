@@ -295,6 +295,91 @@ END_PROGRAM"""})
     assert report.valid, [e.message for e in report.errors]
 
 
+# ───────────────────── global variable lists (<globalVars>) ──────────────
+#
+# GVLs live in <globalVars> under <addData>, not in <pous>, so the POU loop never saw
+# them: on a real project that left 553 declarations unchecked — the HMI<->PLC contract
+# and the physical I/O map among them.
+
+
+def _make_xml_with_gvl(tmp_path: Path, gvl_name: str, var_names: list[str]) -> Path:
+    vars_xml = "".join(
+        f'<variable name="{n}"><type><BOOL/></type></variable>' for n in var_names)
+    xml = tmp_path / "gvl.xml"
+    xml.write_text(f'''<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="" productName="X" productVersion="X" creationDateTime="2026-01-01T00:00:00"/>
+  <contentHeader name="t" modificationDateTime="2026-01-01T00:00:00">
+    <coordinateInfo><fbd><scaling x="1" y="1"/></fbd><ld><scaling x="1" y="1"/></ld><sfc><scaling x="1" y="1"/></sfc></coordinateInfo>
+  </contentHeader>
+  <types><dataTypes/><pous/></types>
+  <instances><configurations/></instances>
+  <addData><data name="x" handleUnknown="implementation">
+    <globalVars name="{gvl_name}">{vars_xml}</globalVars>
+  </data></addData>
+</project>''', encoding="utf-8")
+    return xml
+
+
+def test_gvl_var_faltando_no_xml_e_acusada(tmp_path: Path) -> None:
+    src = _make_source_dir(tmp_path, {"GVL_Test.st": """{attribute 'qualified_only'}
+VAR_GLOBAL
+    bSumida : BOOL;
+    bPresente : BOOL;
+END_VAR"""})
+    xml = _make_xml_with_gvl(tmp_path, "GVL_Test", ["bPresente"])
+    report = validate_semantic(xml, src)
+    assert not report.valid
+    erro = next(e for e in report.errors if e.code == "GVL_VARS_MISSING_BY_NAME")
+    assert "bSumida" in erro.message
+
+
+def test_gvl_inteira_ausente_do_xml_e_acusada(tmp_path: Path) -> None:
+    """CODESYS descarta a lista inteira em silencio e toda referencia a ela quebra."""
+    src = _make_source_dir(tmp_path, {"GVL_Sumida.st": """VAR_GLOBAL
+    bX : BOOL;
+END_VAR"""})
+    xml = _make_xml_with_gvl(tmp_path, "GVL_Outra", ["bX"])
+    report = validate_semantic(xml, src)
+    assert not report.valid
+    assert any(e.code == "GVL_MISSING_IN_XML" for e in report.errors)
+
+
+def test_gvl_completa_passa(tmp_path: Path) -> None:
+    src = _make_source_dir(tmp_path, {"GVL_Test.st": """VAR_GLOBAL
+    bA : BOOL;
+    bB : BOOL;
+END_VAR"""})
+    xml = _make_xml_with_gvl(tmp_path, "GVL_Test", ["bA", "bB"])
+    report = validate_semantic(xml, src)
+    assert report.valid, [e.message for e in report.errors]
+
+
+def test_bloco_com_DOIS_qualificadores_e_lido(tmp_path: Path) -> None:
+    """`VAR_GLOBAL PERSISTENT RETAIN` — qualificadores COMBINAM. Aceitar so um fazia o
+    bloco inteiro sumir, e o que mora nele e' o estado que sobrevive ao power-cut.
+    Medido num projeto real: 13 variaveis invisiveis, entre elas contadores de peca."""
+    st = tmp_path / "GVL_R.st"
+    st.write_text("""{attribute 'qualified_only'}
+VAR_GLOBAL PERSISTENT RETAIN
+    nTable_Count : INT;
+    aTable_Slot : ARRAY[0..3] OF INT;
+END_VAR""", encoding="utf-8")
+    counts = count_st_vars(st)
+    assert counts["total_var_decls"] == 2, "o bloco com 2 qualificadores foi ignorado"
+    assert counts["_var_names"] == ["nTable_Count", "aTable_Slot"]
+
+
+@pytest.mark.parametrize("cabecalho", [
+    "VAR_GLOBAL", "VAR_GLOBAL CONSTANT", "VAR_GLOBAL RETAIN", "VAR_GLOBAL PERSISTENT",
+    "VAR_GLOBAL PERSISTENT RETAIN", "VAR_GLOBAL RETAIN PERSISTENT", "VAR RETAIN",
+])
+def test_variacoes_de_cabecalho_de_bloco(tmp_path: Path, cabecalho: str) -> None:
+    st = tmp_path / "GVL_V.st"
+    st.write_text(f"{cabecalho}\n    bX : BOOL;\nEND_VAR", encoding="utf-8")
+    assert count_st_vars(st)["total_var_decls"] == 1, f"nao leu o bloco '{cabecalho}'"
+
+
 def test_semantic_by_name_nao_dispara_com_dois_pous_no_arquivo(tmp_path: Path) -> None:
     """count_st_vars scans the whole FILE, count_xml_vars scans ONE POU: with 2+ POUs the
     sets are not comparable, and a false positive here would teach people to skip the gate."""
