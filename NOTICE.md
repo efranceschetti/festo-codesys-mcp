@@ -7,6 +7,44 @@ Licensed under the MIT License (see `package.json` `"license": "MIT"`).
 
 ---
 
+## Documentation and reference material
+
+The MIT license above covers the **software**. The knowledge base under `knowledge/` is a
+different matter, and this section states what it is.
+
+**What `knowledge/` contains: our own writing.** Every reference file there is written by
+us — what we measured, which bit had to be set, what an error code meant on the bench, the
+sequence that actually worked — citing the vendor manual as a *source*. Citing a source is
+attribution; it is not redistribution.
+
+**What it must never contain: transcribed vendor manuals.** Festo, CODESYS, Fagor and
+Beckhoff documentation is copyrighted, and most of it carries an explicit clause against
+redistribution — Festo's own wording is *"duplication or reprinting… distribution to third
+parties can only be made with the express consent of Festo SE & Co. KG"*. Converting a PDF
+to Markdown does not change that: it is the same text, redistributed. A file that mirrors a
+manual chapter by chapter does not belong in this repository, and one was removed in
+2026-08-15 for exactly this reason. The policy, with the test to apply before writing, is in
+`knowledge/manuals/README.md`.
+
+**Third-party example projects are not bundled.** Festo publishes an official PLCopen XML
+example for the CMMT-AS-MP-S1; it is *not* shipped here. What `knowledge/festo/festo-ptp-reference.md`
+carries is a summary of the library versions it pins, with attribution. Get the example from
+Festo Support.
+
+### Normative artefacts — provenance stated, terms NOT verified
+
+`knowledge/plcopen/IEC61131_10.xsd` and `IEC61131_10_Example.xml` originate from the IEC
+working group that authors IEC 61131-10 (XML namespace `www.iec.ch/public/TC65SC65BWG7TF10`,
+`author="TF10"`). They are used here as the schema the validator checks generated XML
+against.
+
+The files themselves declare no license, and **we have not verified IEC/PLCopen's
+redistribution terms for them**. If those terms do not permit redistribution, the fix is to
+reference the schema by URL and have users fetch it, rather than ship it. Stated here
+plainly rather than assumed, because assuming is how the manual above got published.
+
+---
+
 ## Third-party software included or wrapped
 
 This project incorporates code and/or wraps APIs from the following
