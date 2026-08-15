@@ -73,8 +73,12 @@ def _make_source_dir(tmp_path: Path, files: dict[str, str]) -> Path:
     return src
 
 
-def _make_xml_with_pou(tmp_path: Path, pou_name: str, vars_xml: str = "", inits: int = 0) -> Path:
-    """Create a minimal PLCopen v2.00 XML with 1 POU + optional vars."""
+def _make_xml_with_pou(tmp_path: Path, pou_name: str, vars_xml: str = "", inits: int = 0,
+                       body: str = "(* x *)") -> Path:
+    """Create a minimal PLCopen v2.00 XML with 1 POU + optional vars.
+
+    `body` must mirror the ST body: since the body-hash gate landed, an XML whose body
+    does not match the source is exactly what the gate exists to reject."""
     init_blocks = "\n".join([
         f'<variable name="rI{i}"><type><REAL/></type><initialValue><simpleValue value="0.0"/></initialValue></variable>'
         for i in range(inits)
@@ -89,7 +93,7 @@ def _make_xml_with_pou(tmp_path: Path, pou_name: str, vars_xml: str = "", inits:
   <types><dataTypes/><pous>
     <pou name="{pou_name}" pouType="program">
       <interface><localVars>{vars_xml}{init_blocks}</localVars></interface>
-      <body><ST><xhtml:p><![CDATA[(* x *)]]></xhtml:p></ST></body>
+      <body><ST><xhtml:p><![CDATA[{body}]]></xhtml:p></ST></body>
     </pou>
   </pous></types>
   <instances><configurations/></instances>
@@ -110,7 +114,7 @@ END_PROGRAM"""})
     vars_xml = "".join([
         f'<variable name="i{n}"><type><INT/></type></variable>' for n in "ABC"
     ])
-    xml = _make_xml_with_pou(tmp_path, "PRG_X", vars_xml=vars_xml)
+    xml = _make_xml_with_pou(tmp_path, "PRG_X", vars_xml=vars_xml, body="iA := 1;")
 
     report = validate_semantic(xml, src)
     assert report.valid, f"expected VALID, errors: {[e.message for e in report.errors]}"
@@ -219,6 +223,82 @@ END_PROGRAM"""})
     assert any(e.code == "POU_MISSING_IN_XML" for e in report.errors)
 
 
+# ───────────────────────── the POU body (not just declarations) ───────────
+#
+# Everything else compares declarations. Change the logic without regenerating the XML
+# and all of it stays green while the XML being imported still carries the old algorithm
+# — which is the 2026-05-22 incident, 203 CODESYS errors from a stale master-final.xml.
+
+
+def test_corpo_divergente_e_acusado(tmp_path: Path) -> None:
+    src = _make_source_dir(tmp_path, {"PRG_X.st": """PROGRAM PRG_X
+VAR
+    iA : INT;
+END_VAR
+iA := iA + 1;
+END_PROGRAM"""})
+    xml = _make_xml_with_pou(
+        tmp_path, "PRG_X",
+        vars_xml='<variable name="iA"><type><INT/></type></variable>',
+        body="iA := iA - 1;")          # XML velho: outro operador
+    report = validate_semantic(xml, src)
+    assert not report.valid
+    erro = next(e for e in report.errors if e.code == "POU_BODY_DIFFERS")
+    assert "PRG_X" in erro.location
+
+
+def test_corpo_igual_com_comentarios_diferentes_passa(tmp_path: Path) -> None:
+    """Comentario nao e' logica: divergir por causa dele so' ensina a pular o gate."""
+    src = _make_source_dir(tmp_path, {"PRG_X.st": """PROGRAM PRG_X
+VAR
+    iA : INT;
+END_VAR
+(* comentario que so' existe no ST *)
+iA := iA + 1;   // e este tambem
+END_PROGRAM"""})
+    xml = _make_xml_with_pou(
+        tmp_path, "PRG_X",
+        vars_xml='<variable name="iA"><type><INT/></type></variable>',
+        body="iA := iA + 1;")
+    report = validate_semantic(xml, src)
+    assert report.valid, [e.message for e in report.errors]
+
+
+def test_corpo_igual_com_indentacao_diferente_passa(tmp_path: Path) -> None:
+    src = _make_source_dir(tmp_path, {"PRG_X.st": """PROGRAM PRG_X
+VAR
+    iA : INT;
+END_VAR
+IF iA > 0 THEN
+        iA := 0;
+END_IF
+END_PROGRAM"""})
+    xml = _make_xml_with_pou(
+        tmp_path, "PRG_X",
+        vars_xml='<variable name="iA"><type><INT/></type></variable>',
+        body="IF iA > 0 THEN\niA := 0;\nEND_IF")
+    report = validate_semantic(xml, src)
+    assert report.valid, [e.message for e in report.errors]
+
+
+def test_corpo_com_linha_a_MENOS_e_acusado(tmp_path: Path) -> None:
+    """Perder uma linha e' o caso silencioso: contagem de var intacta, logica mutilada."""
+    src = _make_source_dir(tmp_path, {"PRG_X.st": """PROGRAM PRG_X
+VAR
+    iA : INT;
+END_VAR
+iA := 1;
+iA := iA + 1;
+END_PROGRAM"""})
+    xml = _make_xml_with_pou(
+        tmp_path, "PRG_X",
+        vars_xml='<variable name="iA"><type><INT/></type></variable>',
+        body="iA := 1;")
+    report = validate_semantic(xml, src)
+    assert not report.valid
+    assert any(e.code == "POU_BODY_DIFFERS" for e in report.errors)
+
+
 def test_semantic_xml_inexistente(tmp_path: Path) -> None:
     src = _make_source_dir(tmp_path, {"x.st": ""})
     report = validate_semantic(tmp_path / "nope.xml", src)
@@ -290,7 +370,8 @@ END_VAR
 iValue := 1;
 END_PROGRAM"""})
     xml = _make_xml_with_pou(
-        tmp_path, "PRG_X", vars_xml='<variable name="IVALUE"><type><INT/></type></variable>')
+        tmp_path, "PRG_X", vars_xml='<variable name="IVALUE"><type><INT/></type></variable>',
+        body="iValue := 1;")
     report = validate_semantic(xml, src)
     assert report.valid, [e.message for e in report.errors]
 

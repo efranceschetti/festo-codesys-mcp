@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
+from hashlib import sha1
 from pathlib import Path
 from typing import Any
 
@@ -117,6 +118,35 @@ def count_st_vars(st_path: Path) -> dict[str, Any]:
     counts["_var_names"] = var_names
 
     return dict(counts)
+
+
+def extract_st_body(text: str, pou_name: str) -> str | None:
+    """The executable body of one POU: from `PROGRAM X` to `END_PROGRAM`, minus the VAR
+    blocks (those are already compared declaration by declaration)."""
+    m = re.search(
+        rf"^\s*(PROGRAM|FUNCTION_BLOCK|FUNCTION)\s+{re.escape(pou_name)}\b(.*?)^\s*END_\1",
+        text, re.S | re.M | re.I,
+    )
+    if not m:
+        return None
+    body = m.group(2)
+    return re.sub(r"^\s*VAR(_\w+)?[^\n]*\n.*?^\s*END_VAR", "", body, flags=re.S | re.M | re.I)
+
+
+def normalize_body(s: str) -> str:
+    """Strip comments and per-line indentation, keep line structure and case.
+
+    Deliberately the STRICTEST normalisation that still survives the generator: measured
+    on a real project, all 27 POUs match at this level, so nothing is gained by loosening
+    it further — and every loosening is logic the gate stops seeing.
+    """
+    s = re.sub(r"\(\*.*?\*\)", "", s, flags=re.S)
+    s = re.sub(r"//[^\n]*", "", s)
+    return "\n".join(line.strip() for line in s.splitlines() if line.strip())
+
+
+def body_hash(s: str) -> str:
+    return sha1(normalize_body(s).encode("utf-8")).hexdigest()
 
 
 def count_xml_vars(xml_root: etree._Element, pou_name: str) -> dict[str, Any]:
@@ -290,6 +320,35 @@ def validate_semantic(
                         code="VARS_MISSING_BY_NAME",
                         message=(f"{len(faltando)} var(s) declared in the ST are absent from the "
                                  f"XML by name: {amostra}{resto}"),
+                    ))
+
+            # THE BODY — the code that actually reaches the PLC.
+            #
+            # Everything above compares declarations. Change the logic without
+            # regenerating the XML and all of it stays green, while the XML that gets
+            # imported still carries the old algorithm. That is not hypothetical: it is
+            # the 2026-05-22 incident, where a stale master-final.xml went in and produced
+            # 203 CODESYS errors.
+            #
+            # Comments and indentation are normalised away; line structure and case are
+            # NOT. Measured on a real 27-POU project, all 27 bodies match at this level —
+            # the generator preserves them faithfully, so there is nothing to gain by
+            # loosening further, and every loosening is logic the gate stops seeing.
+            pou_el = xml_root.find(f'.//{NS}pou[@name="{pou_name}"]')
+            st_body_el = pou_el.find(f"{NS}body/{NS}ST") if pou_el is not None else None
+            corpo_st = extract_st_body(st.read_text(encoding="utf-8", errors="replace"), pou_name)
+            if corpo_st is not None and st_body_el is not None:
+                corpo_xml = "".join(st_body_el.itertext())
+                if body_hash(corpo_st) != body_hash(corpo_xml):
+                    errors.append(ValidationError(
+                        line=None,
+                        location=f"{st.name}::{pou_name}",
+                        code="POU_BODY_DIFFERS",
+                        message=(
+                            f"the body of '{pou_name}' differs between the ST source and the "
+                            f"XML (ST {len(normalize_body(corpo_st))} chars vs XML "
+                            f"{len(normalize_body(corpo_xml))} after normalisation) — the XML "
+                            f"is most likely stale: regenerate it before importing"),
                     ))
 
             if st_total > 0 and xml_total < st_total * vars_tolerance:
