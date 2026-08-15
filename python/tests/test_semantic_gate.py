@@ -231,3 +231,106 @@ def test_semantic_source_dir_inexistente(tmp_path: Path) -> None:
     report = validate_semantic(xml, tmp_path / "no_src")
     assert not report.valid
     assert report.errors[0].code == "DIR_NOT_FOUND"
+
+
+# ─────────────────────── comparison BY NAME (not by count) ────────────────
+#
+# Counting has a ceiling: a renamed or retyped variable keeps the count identical and
+# passes at ANY tolerance, 1.00 included. Measured on a real 27-POU project: renaming a
+# single variable inside one POU left the count at 62 → 62 and every count-based check
+# stayed green. These tests pin the by-name comparison that does catch it.
+
+
+def test_count_st_vars_coleta_os_nomes_declarados(tmp_path: Path) -> None:
+    """Names come from the declaration: with AT %, and several per line."""
+    st = tmp_path / "PRG_N.st"
+    st.write_text("""PROGRAM PRG_N
+VAR
+    bStart AT %IX0.0 : BOOL;
+    iA, iB, iC : INT;
+    rValue : REAL := 3.14;
+END_VAR
+iA := 1;
+END_PROGRAM""", encoding="utf-8")
+    nomes = count_st_vars(st)["_var_names"]
+    assert nomes == ["bStart", "iA", "iB", "iC", "rValue"], nomes
+
+
+def test_semantic_detecta_rename_que_a_contagem_nao_ve(tmp_path: Path) -> None:
+    """The whole point: same count, different name. This is the 'wrong tag' class —
+    an identifier that crosses a boundary and no longer matches on the other side."""
+    src = _make_source_dir(tmp_path, {"PRG_X.st": """PROGRAM PRG_X
+VAR
+    iA : INT;
+    iRENOMEADA : INT;
+    iC : INT;
+END_VAR
+iA := 1;
+END_PROGRAM"""})
+    # XML still carries the OLD name — count matches (3 = 3), name does not
+    vars_xml = "".join([
+        f'<variable name="i{n}"><type><INT/></type></variable>' for n in ("A", "B", "C")
+    ])
+    xml = _make_xml_with_pou(tmp_path, "PRG_X", vars_xml=vars_xml)
+
+    report = validate_semantic(xml, src)
+    assert not report.valid, "a rename with matching count must NOT pass"
+    erro = next(e for e in report.errors if e.code == "VARS_MISSING_BY_NAME")
+    assert "iRENOMEADA" in erro.message, erro.message
+    # and prove the count-based check was blind to it, even at the strictest tolerance
+    assert not any(e.code == "VARS_MISSING" for e in report.errors)
+
+
+def test_semantic_by_name_ignora_caixa(tmp_path: Path) -> None:
+    """IEC 61131-3 identifiers are case-insensitive: iValue == IVALUE."""
+    src = _make_source_dir(tmp_path, {"PRG_X.st": """PROGRAM PRG_X
+VAR
+    iValue : INT;
+END_VAR
+iValue := 1;
+END_PROGRAM"""})
+    xml = _make_xml_with_pou(
+        tmp_path, "PRG_X", vars_xml='<variable name="IVALUE"><type><INT/></type></variable>')
+    report = validate_semantic(xml, src)
+    assert report.valid, [e.message for e in report.errors]
+
+
+def test_semantic_by_name_nao_dispara_com_dois_pous_no_arquivo(tmp_path: Path) -> None:
+    """count_st_vars scans the whole FILE, count_xml_vars scans ONE POU: with 2+ POUs the
+    sets are not comparable, and a false positive here would teach people to skip the gate."""
+    src = _make_source_dir(tmp_path, {"DOIS.st": """PROGRAM PRG_A
+VAR
+    iDoA : INT;
+END_VAR
+iDoA := 1;
+END_PROGRAM
+
+PROGRAM PRG_B
+VAR
+    iDoB : INT;
+END_VAR
+iDoB := 1;
+END_PROGRAM"""})
+    xml = tmp_path / "dois.xml"
+    xml.write_text('''<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <fileHeader companyName="" productName="X" productVersion="X" creationDateTime="2026-01-01T00:00:00"/>
+  <contentHeader name="t" modificationDateTime="2026-01-01T00:00:00">
+    <coordinateInfo><fbd><scaling x="1" y="1"/></fbd><ld><scaling x="1" y="1"/></ld><sfc><scaling x="1" y="1"/></sfc></coordinateInfo>
+  </contentHeader>
+  <types><dataTypes/><pous>
+    <pou name="PRG_A" pouType="program">
+      <interface><localVars><variable name="iDoA"><type><INT/></type></variable></localVars></interface>
+      <body><ST><xhtml:p><![CDATA[(* x *)]]></xhtml:p></ST></body>
+    </pou>
+    <pou name="PRG_B" pouType="program">
+      <interface><localVars><variable name="iDoB"><type><INT/></type></variable></localVars></interface>
+      <body><ST><xhtml:p><![CDATA[(* x *)]]></xhtml:p></ST></body>
+    </pou>
+  </pous></types>
+  <instances><configurations/></instances>
+</project>''', encoding="utf-8")
+
+    report = validate_semantic(xml, src)
+    assert not any(e.code == "VARS_MISSING_BY_NAME" for e in report.errors), \
+        "must not compare names when the file declares more than one POU"

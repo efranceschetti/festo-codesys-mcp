@@ -21,8 +21,13 @@ from .types import ValidationError, ValidationReport
 
 NS = "{http://www.plcopen.org/xml/tc6_0200}"
 
-DEFAULT_VARS_TOLERANCE = 0.75       # if XML < 75% of the ST vars → fail
-DEFAULT_INITS_TOLERANCE = 0.7       # if XML < 70% of the ST inits → fail
+# Tolerances were 0.75/0.70 — a 25%/30% slack that was never used: measured against a real
+# 27-POU project, ST and XML match 1:1 on every POU, so 1.00 costs zero red and removes room
+# for a real loss to hide in. Note the ceiling of what counting can do: renaming a variable
+# keeps the count identical and passes at ANY tolerance, 1.00 included — that is what the
+# by-name comparison below is for.
+DEFAULT_VARS_TOLERANCE = 1.0        # if the XML has FEWER vars than the ST → fail
+DEFAULT_INITS_TOLERANCE = 1.0       # idem for initial values
 
 
 def count_st_vars(st_path: Path) -> dict[str, Any]:
@@ -77,6 +82,7 @@ def count_st_vars(st_path: Path) -> dict[str, Any]:
     total_vars = 0
     init_vars = 0
     array_init_vars = 0
+    var_names: list[str] = []
     for line in text_clean.splitlines():
         s = line.strip()
         if re.match(r"^VAR(_\w+)?\s*(CONSTANT|RETAIN|PERSISTENT)?\s*$", s, re.IGNORECASE):
@@ -91,9 +97,18 @@ def count_st_vars(st_path: Path) -> dict[str, Any]:
                 init_vars += 1
                 if "[" in s.split(":=")[1] or s.split(":=")[1].strip().startswith("("):
                     array_init_vars += 1
+            # Declared names, for comparison BY NAME (not by count).
+            # IEC 61131-3: `name [, name2] [AT %addr] : type [:= init] ;`
+            decl = s.split(":")[0]
+            decl = re.sub(r"\s+AT\s+%[IQM][XWBD]?[\d.]+", "", decl, flags=re.IGNORECASE)
+            for nome in decl.split(","):
+                nome = nome.strip()
+                if re.match(r"^[A-Za-z_]\w*$", nome):
+                    var_names.append(nome)
     counts["total_var_decls"] = total_vars
     counts["vars_with_init"] = init_vars
     counts["vars_with_array_init"] = array_init_vars
+    counts["_var_names"] = var_names
 
     return dict(counts)
 
@@ -118,6 +133,7 @@ def count_xml_vars(xml_root: etree._Element, pou_name: str) -> dict[str, Any]:
         counts["total_inits"] = 0
         return dict(counts)
 
+    var_names: list[str] = []
     for kind in ["inputVars", "outputVars", "inOutVars", "localVars",
                  "externalVars", "globalVars"]:
         blocks = interface.findall(f"{NS}{kind}")
@@ -128,10 +144,13 @@ def count_xml_vars(xml_root: etree._Element, pou_name: str) -> dict[str, Any]:
             vars_in_block = block.findall(f"{NS}variable")
             var_count += len(vars_in_block)
             for v in vars_in_block:
+                if v.get("name"):
+                    var_names.append(v.get("name"))
                 if v.find(f"{NS}initialValue") is not None:
                     init_count += 1
         counts[f"{kind}_var_count"] = var_count
         counts[f"{kind}_init_count"] = init_count
+    counts["_var_names"] = var_names
 
     counts["total_vars"] = sum(v for k, v in counts.items() if k.endswith("_var_count"))
     counts["total_inits"] = sum(v for k, v in counts.items() if k.endswith("_init_count"))
@@ -206,6 +225,29 @@ def validate_semantic(
 
             st_total = st_counts.get("total_var_decls", 0)
             xml_total = xml_counts.get("total_vars", 0)
+
+            # Comparison BY NAME — catches what counting never will: a renamed or
+            # retyped variable keeps the count identical and slips through every
+            # tolerance level. Only runs when the .st declares exactly ONE POU,
+            # because count_st_vars scans the whole FILE while count_xml_vars scans a
+            # single POU; with 2+ POUs the sets are not comparable and we would emit
+            # false positives — and a gate that cries wolf is a gate that gets skipped.
+            if len(pou_names) == 1:
+                st_names = st_counts.get("_var_names") or []
+                xml_names = xml_counts.get("_var_names") or []
+                # IEC 61131-3 identifiers are case-insensitive; compare folded, report as written.
+                xml_fold = {n.lower() for n in xml_names}
+                faltando = [n for n in st_names if n.lower() not in xml_fold]
+                if faltando:
+                    amostra = ", ".join(faltando[:8])
+                    resto = f" (+{len(faltando) - 8})" if len(faltando) > 8 else ""
+                    errors.append(ValidationError(
+                        line=None,
+                        location=f"{st.name}::{pou_name}",
+                        code="VARS_MISSING_BY_NAME",
+                        message=(f"{len(faltando)} var(s) declared in the ST are absent from the "
+                                 f"XML by name: {amostra}{resto}"),
+                    ))
 
             if st_total > 0 and xml_total < st_total * vars_tolerance:
                 pct = (xml_total * 100 // st_total) if st_total else 0
