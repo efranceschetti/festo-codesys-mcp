@@ -4,10 +4,10 @@
  * Generates a synthetic, fully generic PLCopen TC6 0200 XML fixture used by the
  * Python XSD-gate tests. It reuses the SAME generator that the `generate_plcopen_xml`
  * MCP tool uses (parseStFile + buildProjectXml from build/), so the fixture proves
- * the production pipeline against a large, multi-POU project without shipping any
- * real customer export.
+ * the production pipeline against a large, multi-POU project using only generated,
+ * non-proprietary content.
  *
- * Coverage (mirrors the reference project the fixture replaces):
+ * Coverage (shaped like a large multi-POU machine project):
  *   - 20+ Function Blocks (FB_Station01..FB_StationNN) with a 0/10/20/90/99 state
  *     machine, nested FB instances, and bErr/nErrId error interface
  *   - 2 helper FBs used as nested instances (FB_Debounce, FB_Delay)

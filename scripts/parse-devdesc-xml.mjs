@@ -5,7 +5,7 @@
 // Usage:
 //   node scripts/parse-devdesc-xml.mjs
 //
-// Reads from: knowledge/external/_raw/**/Devices/**/*.devdesc.xml (extracted by W3)
+// Reads from: knowledge/external/_raw/**/Devices/**/*.devdesc.xml
 // Writes: knowledge/external/festo-private/festo-devices-extracted.md
 //
 // Filters: skip 3S generic devices, skip Beckhoff/etc — keep only Festo.

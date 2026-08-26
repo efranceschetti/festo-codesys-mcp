@@ -41,7 +41,7 @@ def count_st_vars(st_path: Path) -> dict[str, Any]:
         total_var_decls: int
         vars_with_init: int
         vars_with_array_init: int
-        vars_at_addr: int                (vars with AT %IX/QX/IW/QW — Bug A)
+        vars_at_addr: int                (vars with AT %IX/QX/IW/QW)
         block_var_input/output/in_out/local/constant/global/global_const: int
     """
     text = st_path.read_text(encoding="utf-8", errors="replace")
@@ -70,7 +70,7 @@ def count_st_vars(st_path: Path) -> dict[str, Any]:
     ]:
         counts[f"block_{kind}"] = len(re.findall(pattern, text_clean, re.IGNORECASE))
 
-    # Vars with AT %IX/QX/IW/QW (Bug A target).
+    # Vars with AT %IX/QX/IW/QW.
     # IEC 61131-3 syntax: `<name> [AT <address>] : <type> [:= <init>] ;`
     # i.e. AT comes AFTER the name and BEFORE the `:`.
     counts["vars_at_addr"] = len(re.findall(
@@ -137,7 +137,7 @@ def normalize_body(s: str) -> str:
     """Strip comments and per-line indentation, keep line structure and case.
 
     Deliberately the STRICTEST normalisation that still survives the generator: measured
-    on a real project, all 27 POUs match at this level, so nothing is gained by loosening
+    across a full project, every POU body still matches at this level, so nothing is gained by loosening
     it further — and every loosening is logic the gate stops seeing.
     """
     s = re.sub(r"\(\*.*?\*\)", "", s, flags=re.S)
@@ -202,8 +202,8 @@ def validate_semantic(
 ) -> ValidationReport:
     """
     Validate the master XML against the ST source files. Detects:
-      - Bug A/B/F: missing vars (source count > XML count * tolerance)
-      - Bug E: lost inits (source init count > XML init count * tolerance)
+      - missing vars (source count > XML count * tolerance)
+      - lost inits (source init count > XML init count * tolerance)
       - POU declared in the ST but absent from the XML
 
     Args:
@@ -244,8 +244,8 @@ def validate_semantic(
     # POU loop below never saw them. Over a full project that leaves hundreds of
     # declarations unchecked — among them the HMI<->PLC contract and the physical I/O
     # map, where most variables carry an `AT %IX/%QX` address. Those are boundaries:
-    # exactly where a lost
-    # or renamed identifier stops raising an error and starts silently returning nothing.
+    # exactly where a lost or renamed identifier stops raising an error and starts
+    # silently returning nothing.
     xml_gvls: dict[str, set[str]] = {}
     for el in xml_root.iter():
         if el.tag == f"{NS}globalVars" and el.get("name"):
@@ -358,10 +358,10 @@ def validate_semantic(
                     line=None,
                     location=f"{st.name}::{pou_name}",
                     code="VARS_MISSING",
-                    message=f"ST has {st_total} vars, XML has {xml_total} ({pct}%) — Bug A/B/F suspected",
+                    message=f"ST has {st_total} vars, XML has {xml_total} ({pct}%) — declarations dropped by the generator",
                 ))
 
-            # Bug A: vars with AT %
+            # vars with AT %
             if st_counts.get("vars_at_addr", 0) > 0:
                 pou_node = xml_root.find(f'.//{NS}pou[@name="{pou_name}"]')
                 if pou_node is not None and len(pou_node.findall(f".//{NS}address")) == 0:
@@ -369,10 +369,10 @@ def validate_semantic(
                         line=None,
                         location=f"{st.name}::{pou_name}",
                         code="AT_ADDR_LOST",
-                        message=f"ST has {st_counts['vars_at_addr']} vars with AT %IX/QX, XML has 0 addresses — Bug A",
+                        message=f"ST has {st_counts['vars_at_addr']} vars with AT %IX/QX, XML has 0 addresses — hardware mapping lost",
                     ))
 
-            # Bug E: inits
+            # inits
             st_inits = st_counts.get("vars_with_init", 0)
             xml_inits = xml_counts.get("total_inits", 0)
             if st_inits > 0 and xml_inits < st_inits * inits_tolerance:
@@ -380,7 +380,7 @@ def validate_semantic(
                     line=None,
                     location=f"{st.name}::{pou_name}",
                     code="INITS_MISSING",
-                    message=f"ST has {st_inits} inits, XML has {xml_inits} — Bug E suspected",
+                    message=f"ST has {st_inits} inits, XML has {xml_inits} — initial values lost",
                 ))
 
     valid = len(errors) == 0

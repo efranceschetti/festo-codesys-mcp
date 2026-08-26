@@ -14,7 +14,7 @@ const SENSITIVE_PREFIXES = [
 ];
 
 /**
- * D5-001: Workspace jail. The 7 creation tools accept an arbitrary `outputDir`.
+ * Workspace jail. The 7 creation tools accept an arbitrary `outputDir`.
  * SENSITIVE_PREFIXES alone was Linux-only — on Windows, paths like
  * C:\\Users\\<user>\\.ssh or C:\\Windows\\System32 passed without an alarm.
  * Resolves absolutely and requires that it fall inside process.cwd().
@@ -25,7 +25,7 @@ const SENSITIVE_PREFIXES = [
 function isInsideWorkspace(absolutePath: string): boolean {
   if (process.env.FESTO_MCP_ALLOW_OUTSIDE_WORKSPACE === '1') return true;
   const workspace = resolve(process.cwd());
-  // P2.0/A2: Windows filesystems are case-insensitive — `D:\ws` and `d:\ws`
+  // Windows filesystems are case-insensitive — `D:\ws` and `d:\ws`
   // are the same directory, but process.cwd() and user input may disagree on
   // drive-letter (or any segment) case. Fold case on win32 only; POSIX
   // filesystems are case-sensitive and must keep the exact comparison.
@@ -71,7 +71,7 @@ export function validatePath(userPath: string): string | null {
     return 'Invalid path: directory traversal (..) not allowed';
   }
 
-  // D5-001: workspace jail (Windows-aware). Applies AFTER the syntactic
+  // Workspace jail (Windows-aware). Applies AFTER the syntactic
   // validations to allow the specific traversal message above.
   const absolute = resolve(userPath);
   if (!isInsideWorkspace(absolute)) {

@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { resolve, sep } from 'node:path';
 import { validatePath } from '../utils/path-validation.js';
 
-// D5-001: most legacy tests assume that absolute paths like
+// Most legacy tests assume that absolute paths like
 // `/home/user/project` are accepted (Linux semantics). On Windows and on CI
 // where `process.cwd()` differs, these paths fall OUTSIDE the workspace
 // and the jail rejects them. Enabling the escape hatch around the legacy tests

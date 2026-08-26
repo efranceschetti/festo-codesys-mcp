@@ -30,7 +30,7 @@ export function validateFbInterface(code: string): ValidationResult {
     };
   }
 
-  // D5-009: word boundary em vez de substring. Antes `nbEnableCount` casava
+  // Word boundary em vez de substring. Antes `nbEnableCount` casava
   // como "bEnable presente" porque a string "bEnable" aparece dentro;
   // \b rejeita esse falso positivo.
   const hasWord = (varName: string): boolean =>

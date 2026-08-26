@@ -1,8 +1,8 @@
 """
 Semantic gate tests: count vars/inits, ST source vs XML.
 
-Coverage: Bug A (vars with AT %IX disappearing), Bug B (2nd VAR_GLOBAL block),
-Bug E (lost array init), Bug F (var after a comment), POU_MISSING_IN_XML.
+Coverage: vars with AT %IX disappearing, 2nd VAR_GLOBAL block, lost array init,
+var right after a comment, POU_MISSING_IN_XML.
 """
 from __future__ import annotations
 
@@ -50,7 +50,7 @@ END_TYPE""", encoding="utf-8")
 
 
 def test_count_st_vars_at_address(tmp_path: Path) -> None:
-    """Vars with AT %IX/QX detected (Bug A target)."""
+    """Vars with AT %IX/QX detected."""
     st = tmp_path / "GVL_IO.st"
     st.write_text("""PROGRAM GVL_IO
 VAR_GLOBAL
@@ -123,7 +123,7 @@ END_PROGRAM"""})
 
 
 def test_semantic_detecta_bug_a_at_addr_lost(tmp_path: Path) -> None:
-    """Bug A: ST has 3 vars with AT %IX, XML has no address."""
+    """ST has 3 vars with AT %IX, XML has no address."""
     src = _make_source_dir(tmp_path, {"GVL_IO.st": """PROGRAM GVL_IO
 VAR_GLOBAL
     bStart AT %IX0.0 : BOOL;
@@ -144,7 +144,7 @@ END_PROGRAM"""})
 
 
 def test_semantic_detecta_bug_b_vars_missing(tmp_path: Path) -> None:
-    """Bug B: ST has 10 vars, XML has only 2 (< 75% tolerance)."""
+    """ST has 10 vars, XML has only 2 (< 75% tolerance)."""
     st_vars = "\n    ".join([f"iX{n} : INT;" for n in range(10)])
     src = _make_source_dir(tmp_path, {"PRG_Y.st": f"""PROGRAM PRG_Y
 VAR
@@ -161,7 +161,7 @@ END_PROGRAM"""})
 
 
 def test_semantic_detecta_bug_e_inits_missing(tmp_path: Path) -> None:
-    """Bug E: ST has 10 vars with init, XML has 2."""
+    """ST has 10 vars with init, XML has 2."""
     st_vars = "\n    ".join([f"rX{n} : REAL := 1.0;" for n in range(10)])
     src = _make_source_dir(tmp_path, {"PRG_Z.st": f"""PROGRAM PRG_Z
 VAR

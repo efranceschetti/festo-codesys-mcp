@@ -17,8 +17,8 @@ describe('tokenize', () => {
     assert.ok(tokens.includes('cia402'));
   });
 
-  it('decomposes snake_case identifier into sub-tokens (regression: Bug A1)', () => {
-    // Bug A1: natural-language search for "cycle time exceeded" did not match
+  it('decomposes snake_case identifier into sub-tokens', () => {
+    // Natural-language search for "cycle time exceeded" did not match
     // `RTSEXCPT_CYCLE_TIME_EXCEED` because the tokenizer kept the _ joined.
     // Fix: besides the full token, it also generates components split by _.
     const tokens = tokenize('RTSEXCPT_CYCLE_TIME_EXCEED');

@@ -2,7 +2,8 @@
  * Validation Framework Types
  *
  * Consistent response shapes for all validators.
- * Pattern ported from EplanMCP validators.py.
+ * Every validator returns the same result shape, so callers can aggregate
+ * results without special-casing which validator produced them.
  */
 
 export interface ValidationResult {

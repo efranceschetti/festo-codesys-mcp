@@ -18,7 +18,7 @@ export type ParsedFile = {
 
 /**
  * Remove block comments `(* ... *)` correctly, supporting nesting.
- * F3-046: lazy regex `/\\(\\*[\\s\\S]*?\\*\\)/g` breaks with `(* outer (* inner *) *)`
+ * Lazy regex `/\\(\\*[\\s\\S]*?\\*\\)/g` breaks with `(* outer (* inner *) *)`
  * because it matches up to the first `*)`. This implementation uses a depth
  * counter — IEC 61131-3 and CODESYS V3.5 allow nesting.
  */
@@ -53,7 +53,7 @@ export function stripBlockComments(text: string): string {
  * regex on "clean" content and map back to slicing the original
  * content (preserving inline comments for parsing declarations).
  *
- * Bug C fix #2: without this, "VAR_GLOBAL" mentioned in a header
+ * Fix #2: without this, "VAR_GLOBAL" mentioned in a header
  * comment confused the block regex; but plain stripBlockComments
  * shifts the offsets and prevented precise extraction of the real block.
  */
@@ -85,7 +85,7 @@ export function maskBlockComments(text: string): string {
 }
 
 /**
- * P2.0/A4: Remove ONE leading `(* ... *)` block comment (nesting-aware).
+ * Remove ONE leading `(* ... *)` block comment (nesting-aware).
  * IEC 61131-3 block comments nest; a lazy regex stops at the first `*)` and
  * leaves the comment tail glued to the next declaration, which then silently
  * fails declRe — the variable disappears from the XML with no warning.
@@ -115,7 +115,7 @@ function parseVarBlock(block: string): VarDeclaration[] {
   // Strip BOM
   const original = block.startsWith('﻿') ? block.slice(1) : block;
 
-  // Bug C fix #4: uses MASKED (comments → spaces with offsets preserved)
+  // Fix #4: uses MASKED (comments → spaces with offsets preserved)
   // to detect declaration boundaries via splitStatements and regex,
   // then extracts content from the ORIGINAL at the same offsets. This preserves
   // trailing inline comments `(* ... *)` for capturing the comment field,
@@ -138,13 +138,13 @@ function parseVarBlock(block: string): VarDeclaration[] {
     // Remove residual keywords/pragmas at the start/end of the stmt (the slice
     // comes from the original, only the maskedStripped had keywords removed).
     const kwRe = /(?:\{attribute[^}]*\}|\b(?:VAR_INPUT|VAR_OUTPUT|VAR_IN_OUT|VAR_GLOBAL|VAR_EXTERNAL|VAR_TEMP|VAR_STAT|VAR_PERSISTENT|VAR_RETAIN|VAR_NON_RETAIN|VAR|END_VAR|PERSISTENT|RETAIN|CONSTANT)\b)/gi;
-    // Bug F fix: also removes LEADING comments `(* ... *)` at the start of the
+    // Fix: also removes LEADING comments `(* ... *)` at the start of the
     // stmt. The slice comes from the ORIGINAL (comments preserved so trailing inline
     // ones become the comment field), so a comment on its OWN LINE before the
     // declaration gets stuck at the start (`(* ... *)\n bFirst : BOOL`) and the
     // declRe `^(\w+)` does not match → the 1st var was discarded. We remove only the
     // leading one; the trailing one (after the `;`) is still captured by declRe.
-    // P2.0/A4: the strip must be DEPTH-AWARE — IEC block comments nest, and a
+    // The strip must be DEPTH-AWARE — IEC block comments nest, and a
     // lazy /\(\*[\s\S]*?\*\)/ stops at the first `*)`, leaving `still *)` glued
     // to the next declaration, which then silently fails declRe (variable lost).
     // Strip keyword + leading comment sequences at the start (with whitespace).
@@ -157,7 +157,7 @@ function parseVarBlock(block: string): VarDeclaration[] {
     if (!stmt) continue;
 
     // Regex for an individual declaration.
-    // Bug A fix: captures optional `AT %X.Y` between the name and `:` (preserved in .address).
+    // Fix: captures optional `AT %X.Y` between the name and `:` (preserved in .address).
     const declRe = /^(\w+)\s*(AT\s+%[A-Za-z]+[\d.]+)?\s*:\s*([\s\S]+?)(?:\s*:=\s*([\s\S]+?))?\s*;?\s*(?:\/\/[ \t]*(.*?)|\(\*[ \t]*([\s\S]*?)[ \t]*\*\))?\s*$/;
     const m = stmt.match(declRe);
     if (!m) continue;
@@ -231,7 +231,7 @@ function splitStatementRanges(block: string): Array<[number, number]> {
  * replaced with spaces) and returns the SAME ranges extracted from
  * `original` (comments preserved for trailing inline comments).
  *
- * Bug C fix #3: regex applied on masked does not match VAR_INPUT etc inside
+ * Fix #3: regex applied on masked does not match VAR_INPUT etc inside
  * header/body comments. Slicing the original preserves declaration
  * comments for parseVarBlock to pick up.
  */
@@ -273,7 +273,7 @@ function extractVarSections(content: string): {
     result.inOutVars.push(...parseVarBlock(blk));
   }
 
-  // Bug D fix: VAR CONSTANT separated to emit <localVars constant="true">.
+  // Fix: VAR CONSTANT separated to emit <localVars constant="true">.
   for (const blk of findBlocksOriginal(masked, content, /(?<!\w)VAR\s+CONSTANT\b([\s\S]*?)END_VAR/gi)) {
     result.localConstantVars.push(...parseVarBlock(blk));
   }
@@ -315,7 +315,7 @@ function extractBody(content: string): string {
 
 export function parseStFile(content: string, fileName: string): ParsedFile {
   const trimmed = content.trim();
-  // Bug C fix: masked preserves offsets (comments → spaces), allowing
+  // Fix: masked preserves offsets (comments → spaces), allowing
   // boundary detection without being confused by "VAR_GLOBAL"/"PROGRAM"/etc
   // mentioned in the header comment.
   const masked = maskBlockComments(trimmed);
@@ -328,7 +328,7 @@ export function parseStFile(content: string, fileName: string): ParsedFile {
   const isTypeDecl = /(?:^|\n)\s*TYPE\b/i.test(masked);
   if (!isTypeDecl && (/(?:^|\n)\s*\{attribute\s+'qualified_only'\}/i.test(masked) || /(?:^|\n)\s*VAR_GLOBAL\b/i.test(masked))) {
     const name = fileName.replace(/\.st$/i, '');
-    // Bug B fix: loops over ALL VAR_GLOBAL/VAR_GLOBAL CONSTANT/
+    // Fix: loops over ALL VAR_GLOBAL/VAR_GLOBAL CONSTANT/
     // VAR_GLOBAL PERSISTENT RETAIN blocks. Before it was `.match(/.../i)` (without the g flag).
     const vars: VarDeclaration[] = [];
     const blockPattern = /VAR_GLOBAL\b[^\n]*\n([\s\S]*?)END_VAR/gi;
@@ -339,7 +339,7 @@ export function parseStFile(content: string, fileName: string): ParsedFile {
       vars.push(...parseVarBlock(trimmed));
     }
     const isConstant = /VAR_GLOBAL\s+CONSTANT/i.test(masked);
-    // P2.0/A1: RETAIN/PERSISTENT were silently dropped — CODESYS then imported
+    // RETAIN/PERSISTENT were silently dropped — CODESYS then imported
     // the GVL as a plain VAR_GLOBAL and persistence was lost. Mirror the
     // isConstant handling: derive from the (comment-masked) header line.
     const isRetain = /VAR_GLOBAL[^\n]*\bRETAIN\b/i.test(masked);
@@ -354,7 +354,7 @@ export function parseStFile(content: string, fileName: string): ParsedFile {
   if (/(?:^|\n)\s*TYPE\b/i.test(masked)) {
     const nameMatch = masked.match(/(?:^|\n)\s*TYPE\s+(\w+)\s*:/i);
     const name = nameMatch ? nameMatch[1] : fileName.replace(/\.st$/i, '');
-    // P2.0/A3: the {attribute 'qualified_only'} pragma was silently dropped —
+    // The {attribute 'qualified_only'} pragma was silently dropped —
     // CODESYS then flagged same-named enum members across types as ambiguous.
     // Capture it here (masked → a pragma inside a comment does not count) and
     // let the XML builder emit it as a CODESYS addData attribute.

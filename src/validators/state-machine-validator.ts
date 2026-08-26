@@ -11,7 +11,7 @@ import { stripComments } from '../utils/mcp-helpers.js';
 export function validateStateMachine(code: string): ValidationResult {
   const stripped = stripComments(code);
 
-  // D5-010: accepts state machines in two forms:
+  // Accepts state machines in two forms:
   //   1. legacy `nState := <num>` (direct numeric assignment)
   //   2. enum-style `eMchState := E_MachState.IDLE` (recommended by
   //      CLAUDE.md, but not detected before — guaranteed false negatives)
@@ -61,7 +61,7 @@ export function validateStateMachine(code: string): ValidationResult {
     ...warnings.map(w => `WARNING: ${w}`),
   ];
 
-  // D5-010: numeric ordering failed with enum tokens (NaN). Hybrid sort:
+  // Numeric ordering failed with enum tokens (NaN). Hybrid sort:
   // numerics first asc, then symbols asc.
   const sortStates = (a: string, b: string): number => {
     const na = +a, nb = +b;

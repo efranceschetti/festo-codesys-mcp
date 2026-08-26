@@ -159,9 +159,9 @@ export async function registerResources(server: McpServer) {
     },
   );
 
-  // ── 5. Watch knowledge dirs → emit list_changed (PENDING B2 / F3-015) ─
+  // ── 5. Watch knowledge dirs → emit list_changed ─
 
-  // D5-002: the watcher covers BOTH manual roots: knowledge/manuals/ AND
+  // The watcher covers BOTH manual roots: knowledge/manuals/ AND
   // knowledge/external/festo-private/. Without this, regenerating gated content
   // (errors.ini, ESI dicts, CHM) via scripts/parse-*.mjs leaves the MCP client
   // with a stale list and cachedList pointing to files that no longer exist.
@@ -175,7 +175,7 @@ export async function registerResources(server: McpServer) {
 
   const onManualChange = (event: 'add' | 'unlink' | 'change', path: string): void => {
     if (!path.endsWith('.md')) return;
-    // D5-004: invalidate contentCache by the absolute path (LRU key) — before
+    // Invalidate contentCache by the absolute path (LRU key) — before
     // only the list was invalidated, and edits did not reach the MCP client.
     invalidateManualsCache(path);
     log('info', 'manuals-watcher', `${event}: ${path} → resource list_changed`);
@@ -190,7 +190,7 @@ export async function registerResources(server: McpServer) {
   watcher.on('change', (p) => onManualChange('change', p));
   watcher.on('error', (err) => log('error', 'manuals-watcher', String(err)));
 
-  // D5-018: graceful close — waits for the watcher to close before killing the process.
+  // Graceful close — waits for the watcher to close before killing the process.
   // Trade-off: small delay on Ctrl+C, but avoids a leaked fd in rare cases
   // where the watcher has pending writes/events.
   const shutdown = async (signal: string): Promise<void> => {

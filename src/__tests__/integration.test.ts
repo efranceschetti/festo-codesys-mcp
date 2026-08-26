@@ -618,11 +618,11 @@ END_VAR
 // End-to-end (source .st → PLCopen XML) of the generator's A-F bugs.
 // The unit tests in st-parser.test.ts cover the PARSER; these ensure
 // that the fix propagates to the emitted XML (xml-builder side) — in case
-// the parser preserves it but the builder dropped it (a Bug A regression in
+// the parser preserves it but the builder dropped it (a regression in
 // buildVarSection/buildGvlAddData would go unnoticed without this).
 // ────────────────────────────────────────────────────────────────────
 
-describe('Generator end-to-end — Bug A: address AT % in XML', () => {
+describe('Generator end-to-end: address AT % in XML', () => {
   it('GVL with AT %IX/IW emits address="%..." in XML', () => {
     const st = `VAR_GLOBAL
     bEmergencyOk AT %IX0.0 : BOOL;
@@ -653,7 +653,7 @@ END_PROGRAM`;
   });
 });
 
-describe('Generator end-to-end — Bug B: multiple VAR_GLOBAL in XML', () => {
+describe('Generator end-to-end: multiple VAR_GLOBAL in XML', () => {
   it('3 VAR_GLOBAL blocks → all vars in XML', () => {
     const st = `VAR_GLOBAL
     bX1 : BOOL;
@@ -674,7 +674,7 @@ END_VAR`;
   });
 });
 
-describe('Generator end-to-end — Bug D: VAR CONSTANT in XML', () => {
+describe('Generator end-to-end: VAR CONSTANT in XML', () => {
   it('VAR CONSTANT emits <localVars constant="true"> in XML', () => {
     const st = `FUNCTION_BLOCK FB_SM
 VAR
@@ -693,7 +693,7 @@ END_FUNCTION_BLOCK`;
   });
 });
 
-describe('Generator end-to-end — Bug E: array initializer in XML', () => {
+describe('Generator end-to-end: array initializer in XML', () => {
   it('multi-line ARRAY emits complete initialValue in XML', () => {
     const st = `PROGRAM PRG_E
 VAR
@@ -715,7 +715,7 @@ END_PROGRAM`;
   });
 });
 
-describe('Generator end-to-end — Bug F: 1st var after comment in XML', () => {
+describe('Generator end-to-end: 1st var after comment in XML', () => {
   it('comment on its own line does not drop the 1st var in XML', () => {
     const st = `FUNCTION_BLOCK FB_F
 VAR_INPUT

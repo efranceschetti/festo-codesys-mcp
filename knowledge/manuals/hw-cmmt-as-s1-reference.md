@@ -14,7 +14,7 @@ use_when:
 never_use_when:
   - you need the PLCopen MC_*_Festo function blocks, FAS step-by-step commissioning, or library error codes — see manual hw-cmmt-servo
   - working with the CMMT-ST stepper — see topic festo-cmmt-st (different encoder / open-loop)
-  - you need the complete raw object dictionary (497 objects) — see external/festo-private/cmmt-as-mp-s1-cia402-dict
+  - you need the complete raw object dictionary (497 objects) — this note covers only the key objects; generate the full dict from the device ESI file
 depends_on: [ethercat-cia402]
 related: [hw-cmmt-servo, festo-ptp, festo-cmmt-st]
 keywords: [CMMT-AS, CMMT-AS-S1, S1, STO, SBC, CiA402, CoE, EtherCAT, controlword, statusword, 0x6040, 0x6041, homing, CSP, factor group, Px parameter, Px.8416, 0x607C, 0x6098, polarity, 0x607E, ESM, distributed clocks, 8249086]
@@ -28,7 +28,7 @@ language: pt-BR
 > **📚 Documentos relacionados no MCP** (consolidação 2026-06-01) — este doc é a camada de **protocolo/firmware**:
 > - **`hw-cmmt-servo`** (manual) — FBs PLCopen `MC_*_Festo`, comissionamento FAS passo-a-passo, error codes da library, FAQ. Use para PROGRAMAR via library Festo PtP.
 > - **`ethercat-cia402`** (topic) — perfil CiA 402 genérico multi-vendor. Aqui os bits manufacturer-specific da Festo são especializados (statusword bit 8 = "drive moving", bit 15 = "drive referenced").
-> - **`external/festo-private/cmmt-as-mp-s1-cia402-dict`** — dicionário CRU completo (497 objetos CoE). A seção 16 abaixo lista só os objetos-chave; o dict é a lista autoritativa.
+> - **Dicionário CoE completo (497 objetos)** — não acompanha este repositório: gere-o a partir do arquivo ESI do dispositivo com `scripts/parse-esi-cia402.mjs`. A seção 16 abaixo lista só os objetos-chave.
 > - **`festo-cmmt-st`** (topic) — ⚠️ NÃO confundir: CMMT-ST é stepper (encoder/open-loop diferentes). Este é CMMT-AS servo de malha fechada.
 
 ---
@@ -732,7 +732,7 @@ Menu principal do CDSB:
 
 ## 16. Objetos CoE — Referência Rápida
 
-> Lista parcial dos objetos mais usados. Para o dicionário CRU completo (497 objetos extraídos do ESI, com tipo/access/PDO-flag), ver `external/festo-private/cmmt-as-mp-s1-cia402-dict`. Nota: os clássicos `0x6091` (gear ratio) / `0x6092` (feed constant) **não existem neste servo** — o scaling é via parâmetros Px. Festo (seção 9) / UnitManager interno.
+> Lista parcial dos objetos mais usados. O dicionário CRU completo (497 objetos com tipo/access/PDO-flag) sai do arquivo ESI do dispositivo — gere-o com `scripts/parse-esi-cia402.mjs`. Nota: os clássicos `0x6091` (gear ratio) / `0x6092` (feed constant) **não existem neste servo** — o scaling é via parâmetros Px. Festo (seção 9) / UnitManager interno.
 
 ### Objetos de controle e status
 | Objeto | Sub | Nome | Tipo | R/W |

@@ -104,7 +104,7 @@ Returns: PASSED/ISSUES counts and VALID/FIX verdict.
 
 NOTE: this is a sanity check only. For full validation use:
   - validate_plcopen_xsd      — XSD official PLCopen TC6 v2.00 (catches structural issues)
-  - validate_plcopen_semantic — count vars/inits source ST vs XML (catches Bugs A/B/E/F: missing vars/inits)`,
+  - validate_plcopen_semantic — count vars/inits source ST vs XML (catches vars/inits silently dropped by the generator)`,
       inputSchema: {
         filePath: z.string().min(1).describe('Path to PLCopen XML file'),
       },
@@ -139,8 +139,8 @@ NOTE: this is a sanity check only. For full validation use:
           : fail.push('Missing <?xml?> declaration');
 
         // 2. Well-formedness: real XML parser (fast-xml-parser)
-        // Addresses F3-008/F3-043: replaces .includes() with real validation.
-        // D5-016: top-level import (was a dynamic import inside the handler).
+        // Replaces .includes() with real validation.
+        // Top-level import (was a dynamic import inside the handler).
         const xmlValid = XMLValidator.validate(content);
         if (xmlValid === true) {
           pass.push('XML well-formed');
@@ -312,7 +312,8 @@ for end-to-end coverage (XSD catches structure, semantic catches missing vars/in
 
   // ── validate_plcopen_semantic ───────────────────────────────────────
   // Gate 2: semantic validation — count vars/inits source ST vs XML.
-  // Catches generator Bugs A/B/E/F that the XSD does not detect.
+  // Catches the generator defect classes the XSD does not detect: a dropped
+  // declaration still produces structurally valid XML.
   server.registerTool(
     'validate_plcopen_semantic',
     {
@@ -320,9 +321,9 @@ for end-to-end coverage (XSD catches structure, semantic catches missing vars/in
       description: `Compares variable/initializer counts between source .st files and generated PLCopen XML.
 USE WHEN: after validate_plcopen_xsd passes, to confirm no variables/initializers were silently dropped vs the .st sources.
 Detects bugs where the generator silently drops variables or initializers:
-  - VARS_MISSING        — ST has more vars than XML (Bugs A/B/F)
-  - INITS_MISSING       — ST has more initializers than XML (Bug E)
-  - AT_ADDR_LOST        — ST has vars with AT %IX/QX, XML has 0 <address> tags (Bug A)
+  - VARS_MISSING        — ST has more vars than XML (a declaration was dropped)
+  - INITS_MISSING       — ST has more initializers than XML (an initial value was lost)
+  - AT_ADDR_LOST        — ST has vars with AT %IX/QX, XML has 0 <address> tags (hardware mapping lost)
   - POU_MISSING_IN_XML  — POU declared in .st but absent in XML
 
 Use AFTER validate_plcopen_xsd. If XSD passes but semantic fails, the XML is
@@ -390,7 +391,7 @@ After scaffolding, create files in order: Types → GVLs → FBs → Programs �
         for (const d of dirs) await mkdir(join(projectDir, d), { recursive: true });
 
         if (includeExamples) {
-          // Addresses F3-041: refuse to overwrite existing example files.
+          // Refuse to overwrite existing example files.
           // CODESYS engineers may have already populated 0_Types/, 1_Globals/,
           // 2_Programs/ — overwriting silently destroys work.
           const examples = [

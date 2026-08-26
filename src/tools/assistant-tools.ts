@@ -279,7 +279,7 @@ If not found locally, search the web — then save useful findings to knowledge/
 
         const codeLower = errorCode.toLowerCase();
         const codeHex = errorCode.replace('0x', '').replace('16#', '');
-        // Addresses P3 (Phase 4 audit): filter empty strings out of searchTerms
+        // Filter empty strings out of searchTerms
         // — if codeHex was '' it resulted in searchTerms including '',
         // and lineLower.includes('') === true ⇒ would return ALL manuals
         // (OOM / context window blowup via prompt injection).

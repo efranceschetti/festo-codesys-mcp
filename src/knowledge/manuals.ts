@@ -16,9 +16,9 @@ export const EXTERNAL_KNOWLEDGE_DIR = join(KNOWLEDGE_DIR, 'external');
  * Roots to be searched by listManuals/searchManuals. Each root is
  * walked recursively. Nonexistent roots are silently skipped.
  *
- * Addresses Bug A2/A3: explain_error_code and searchManuals only saw
- * the flat `knowledge/manuals/` — knowledge/external/festo-private/ was
- * invisible even after the extraction pipeline ran.
+ * explain_error_code and searchManuals originally saw only the flat
+ * `knowledge/manuals/` — content under the external root stayed invisible
+ * even after the extraction pipeline had written it.
  */
 const MANUAL_ROOTS = [MANUALS_DIR, EXTERNAL_KNOWLEDGE_DIR];
 
@@ -34,7 +34,7 @@ let cachedList: ManualEntry[] | null = null;
 
 /**
  * LRU cache with a limit in BYTES (not in entry count).
- * Addresses F3-019: the previous contentCache was a Map<string,string> without
+ * The previous contentCache was a Map<string,string> without
  * a limit — in long sessions with many large manuals, the process
  * grew until OOM kill.
  *
@@ -75,7 +75,7 @@ class LruByteCache {
     this.bytesUsed += valueSize;
   }
 
-  /** D5-004: targeted or total invalidation when the watcher detects a change. */
+  /** targeted or total invalidation when the watcher detects a change. */
   delete(key: string): boolean {
     const val = this.cache.get(key);
     if (val === undefined) return false;
@@ -173,7 +173,7 @@ export async function listManuals(): Promise<ManualEntry[]> {
  * filesystem changes (add/unlink/change) so the next list/load reads fresh
  * data from disk.
  *
- * D5-004: now invalidates the contentCache (LRU) too. Before, it only cleared
+ * Now invalidates the contentCache (LRU) too. Before, it only cleared
  * cachedList, and the cached content kept serving stale versions
  * even after `change` events from the watcher — a silent bug where user
  * edits did not reach the MCP client until reboot.
@@ -225,7 +225,7 @@ export interface ManualSearchResult {
  * Search across all manuals for a text query.
  * Returns rendered markdown + total raw match count.
  *
- * Bug B (2026-05-09): consumers with an outputSchema (e.g. explain_error_code)
+ * Consumers with an outputSchema (e.g. explain_error_code)
  * need to know how many real matches there were in manuals. Before, this
  * function only returned an opaque string — `snippetCount` in explain_error_code
  * ignored manual hits and reported 0 even with matches in external/.

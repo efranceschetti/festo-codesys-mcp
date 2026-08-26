@@ -1,8 +1,8 @@
 /**
  * BM25 Full-Text Search Engine
  *
- * Pure TypeScript implementation of Okapi BM25 ranking.
- * Ported from EplanMCP knowledge/searcher.py.
+ * Pure TypeScript implementation of Okapi BM25 ranking
+ * (Robertson & Sparck Jones).
  * Zero external dependencies.
  */
 
@@ -30,7 +30,7 @@ const STOPWORDS = new Set([
  * Snake_case identifiers (e.g. `RTSEXCPT_CYCLE_TIME_EXCEED`, `MC_Power_Festo`)
  * generate BOTH the full token (`mc_power_festo`) AND its components
  * (`mc`, `power`, `festo`) — natural-language search matches via components,
- * exact-identifier search matches via the full token. Fixes Bug A1
+ * exact-identifier search matches via the full token. Fixes the sub-token search gap
  * where searching for "cycle time exceeded" did not find `RTSEXCPT_CYCLE_TIME_EXCEED`.
  */
 export function tokenize(text: string): string[] {
@@ -106,7 +106,7 @@ export class BM25 {
   private docFreqs: Map<string, number> = new Map();
   /**
    * Inverted index: term → Map<docId, term frequency>.
-   * F3-018: replaces the O(N*L) scan with an O(|hits|) lookup.
+   * Replaces the O(N*L) scan with an O(|hits|) lookup.
    * Lucene/Elasticsearch use the same pattern.
    */
   private tfIndex: Map<string, Map<number, number>> = new Map();
@@ -158,7 +158,7 @@ export class BM25 {
 
       const idf = Math.log((this.nDocs - df + 0.5) / (df + 0.5) + 1);
 
-      // F3-018: iterate only over docs that CONTAIN the token (postings list).
+      // Iterate only over docs that CONTAIN the token (postings list).
       const postings = this.tfIndex.get(q);
       if (postings === undefined) continue;
       for (const [docId, tf] of postings) {

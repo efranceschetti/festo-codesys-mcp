@@ -331,20 +331,21 @@ End_Function_Block`;
 });
 
 // ────────────────────────────────────────────────────────────────────
-// Parsing regressions found in real GVLs/POUs during development.
-// Each case below covers a specific parser bug (A/B/E/F).
+// Parser regressions, each reproduced from a GVL or POU that round-tripped wrong.
+// Each case below covers one specific parser defect.
 // ────────────────────────────────────────────────────────────────────
 
-describe('ST Parser — Bug A: AT %X hardware mapping', () => {
+describe('ST Parser: AT %X hardware mapping', () => {
   it('GVL with AT %IX/QX/IW/QW vars preserves all', () => {
     // Pre-fix: vars with `AT %X` were silently skipped by the regex.
-    // A real GVL_IO had 83 vars; only 3 survived (the ones without AT %).
+    // In a GVL that maps physical I/O nearly every declaration carries AT %, so the
+    // regex dropped almost the entire list — only the handful without AT % survived.
     const st = `VAR_GLOBAL
     bEmergencyOk     AT %IX0.0 : BOOL;
     bDoorRelayOk     AT %IX0.1 : BOOL;
     nFlowRate        AT %IW3.0 : INT;
     yMotorMain       AT %QX2.0 : BOOL;
-    nGenPower        AT %QW4.0 : INT;
+    nPumpSpdSp       AT %QW4.0 : INT;
     bSomeFlag        : BOOL;   (* sem AT %X — funciona desde sempre *)
 END_VAR`;
     const result = parseStFile(st, 'GVL_IO.st');
@@ -358,10 +359,10 @@ END_VAR`;
   });
 });
 
-describe('ST Parser — Bug B: multiple VAR_GLOBAL blocks', () => {
+describe('ST Parser: multiple VAR_GLOBAL blocks', () => {
   it('GVL with 3 VAR_GLOBAL blocks (normal + PERSISTENT RETAIN + normal) preserves all', () => {
-    // Pre-fix: only the 1st block was parsed. A real GVL
-    // had 75 vars in 3 blocks; only 48 from the 1st survived.
+    // Pre-fix: only the 1st block was parsed. A GVL split into several VAR_GLOBAL
+    // blocks silently lost everything after the first END_VAR.
     const st = `VAR_GLOBAL
     bX1 : BOOL;
     bX2 : BOOL;
@@ -388,7 +389,7 @@ END_VAR`;
   });
 });
 
-describe('ST Parser — Bug D: separate VAR CONSTANT', () => {
+describe('ST Parser: separate VAR CONSTANT', () => {
   it('POU with VAR + VAR CONSTANT emits separate localConstantVars', () => {
     // Pre-fix: VAR CONSTANT became normal localVars without constant="true".
     // CODESYS complains C0218 "CASE label requires literal or symbolic
@@ -420,10 +421,10 @@ END_FUNCTION_BLOCK`;
   });
 });
 
-describe('ST Parser — Bug E: array initializer multi-line', () => {
+describe('ST Parser: array initializer multi-line', () => {
   it('parses ARRAY OF REAL := [...] spread over multiple lines', () => {
     // Pre-fix: line-by-line parser did not find the final ; → var lost.
-    // A real multi-line ARRAY OF REAL required single-line.
+    // An ARRAY initializer spread over several lines had to be collapsed by hand.
     const st = `PROGRAM PRG_Test
 VAR
     arAngles : ARRAY[0..15] OF REAL := [
@@ -447,8 +448,8 @@ END_PROGRAM`;
   });
 });
 
-describe('ST Parser — Bug F: 1st var after own-line comment', () => {
-  // Regression introduced by the Bug C fix: the 1st declaration right after an
+describe('ST Parser: 1st var after own-line comment', () => {
+  // Regression introduced by the comment-stripping fix: the 1st declaration right after an
   // `(* ... *)` comment on ITS OWN LINE inside a section was discarded.
   // Cause: the range slice came from the ORIGINAL (comments preserved for
   // trailing inline), so the leading comment ended up BEFORE the var name and
@@ -547,7 +548,7 @@ END_VAR`;
   });
 
   it('MULTI-LINE own-line comment does not swallow the following var', () => {
-    // Bug C variant: a 2+ line comment before the only var made
+    // Variant: a 2+ line comment before the only var made
     // inputVars come out empty.
     const st = `FUNCTION_BLOCK FB_BugFMulti
 VAR_INPUT
@@ -582,9 +583,9 @@ END_FUNCTION_BLOCK`;
   });
 });
 
-// ── P2.0 regression suite — generator bugs confirmed against production use ──
-// Each test below guards a bug that was reproduced against the real pipeline
-// before being fixed. Do not weaken these assertions.
+// ── Generator regression suite ──────────────────────────────────────────────
+// Each test below guards a defect that was reproduced end-to-end before being
+// fixed. Do not weaken these assertions.
 
 describe('ST Parser — P2.0 regressions', () => {
   it('GVL: VAR_GLOBAL PERSISTENT RETAIN sets isPersistent and isRetain', () => {
@@ -671,7 +672,7 @@ END_FUNCTION_BLOCK`;
       'variable after a NESTED block comment must survive (silent-loss family)');
   });
 
-  it('VAR block: plain multi-line comment between declarations keeps both vars (Bug F guard)', () => {
+  it('VAR block: plain multi-line comment between declarations keeps both vars', () => {
     const st = `FUNCTION_BLOCK FB_PlainComment
 VAR
     a : INT;

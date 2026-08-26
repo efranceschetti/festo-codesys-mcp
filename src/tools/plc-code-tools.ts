@@ -26,7 +26,7 @@ import { log } from '../utils/logger.js';
 /**
  * IEC 61131-3 identifier rule (§2.1.2): letter or _ followed by
  * letters/digits/_. Applies to zod schemas of tools that generate XML —
- * F3-063: prevents names that break XML 1.0 Name production.
+ * Prevents names that break XML 1.0 Name production.
  */
 const IEC_IDENT_REGEX = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const IEC_IDENT_MSG = 'IEC 61131-3 identifier must start with letter/_ and contain only [A-Za-z0-9_]';
@@ -92,7 +92,7 @@ export function buildStFile(
   addVars('VAR', localVars);
 
   if (stCode) {
-    // Addresses P1-003 (Phase 4 audit): rejects stCode containing terminators
+    // Rejects stCode containing terminators
     // or keywords that start a new POU — prevents "code injection"
     // when concatenating stCode into the .st file. CODESYS rejects compilation with
     // orphan blocks, but the check gives explicit feedback to the caller.

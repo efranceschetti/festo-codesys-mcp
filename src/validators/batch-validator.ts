@@ -2,7 +2,6 @@
  * Batch Validator
  *
  * Runs multiple validators in a single call with aggregate results.
- * Pattern ported from EplanMCP validators.py validate_batch().
  */
 
 import type { ValidationResult, BatchValidationResult } from './types.js';

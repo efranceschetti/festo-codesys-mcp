@@ -107,9 +107,9 @@ describe('External knowledge — gated extraction integration', () => {
     assert.ok(closingDash > 0 && closingDash < 2048, 'frontmatter closes within 2KB');
   });
 
-  // Bug A2/A3 regression — listManuals + searchManuals must walk recursively
+  // Regression — listManuals + searchManuals must walk recursively
   // into knowledge/external/festo-private/, not only flat in knowledge/manuals/.
-  it('listManuals walks recursive into knowledge/external/ (Bug A3)', { skip: !HAS_EXTERNAL }, async () => {
+  it('listManuals walks recursive into knowledge/external/', { skip: !HAS_EXTERNAL }, async () => {
     const manuals = await listManuals();
     const externalEntries = manuals.filter((m) => m.filename.includes('festo-private'));
     assert.ok(externalEntries.length > 0, 'should find at least one entry under festo-private/');
@@ -124,10 +124,10 @@ describe('External knowledge — gated extraction integration', () => {
     );
   });
 
-  it('searchManuals finds RTSEXCPT entries from codesys-runtime-errors.md (Bug A2)', { skip: !HAS_EXTERNAL }, async () => {
+  it('searchManuals finds RTSEXCPT entries from codesys-runtime-errors.md', { skip: !HAS_EXTERNAL }, async () => {
     const result = await searchManuals('0x00000016');
     assert.ok(!result.markdown.startsWith('No matches'), 'searchManuals should match canonical hex code');
-    assert.ok(result.totalMatches > 0, 'searchManuals must report totalMatches > 0 (Bug B regression)');
+    assert.ok(result.totalMatches > 0, 'searchManuals must report totalMatches > 0');
     assert.ok(
       result.markdown.includes('RTSEXCPT_CYCLE_TIME_EXCEED'),
       'searchManuals output must include the canonical RTSEXCPT_ symbol from external/',

@@ -3,7 +3,8 @@
  *
  * Loads externalized data from the data/ directory.
  * If the file is missing or corrupted, returns the embedded fallback.
- * Pattern ported from EplanMCP standard.py _load_json().
+ * The server must start and answer even when a data/ file is missing or corrupt:
+ * a bad JSON degrades that one dataset, never the whole server.
  */
 
 import { readFileSync } from 'fs';

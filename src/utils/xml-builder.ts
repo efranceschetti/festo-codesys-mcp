@@ -10,7 +10,7 @@ const XMLNS = 'http://www.plcopen.org/xml/tc6_0200';
 const XMLNS_XHTML = 'http://www.w3.org/1999/xhtml';
 
 /**
- * D5-008: productVersion in the fileHeader is parameterizable via env.
+ * ProductVersion in the fileHeader is parameterizable via env.
  * Default keeps the historical behavior ("CODESYS V3.5 SP21"). Set
  * CODESYS_PRODUCT_VERSION to align with the real version of the installed CODESYS
  * (SP22+) and avoid cosmetic warnings in the import log.
@@ -33,7 +33,7 @@ export interface PouDefinition {
   inOutVars?: VarDeclaration[];
   localVars?: VarDeclaration[];
   /**
-   * Bug D fix: vars declared in `VAR CONSTANT ... END_VAR` in the source .st.
+   * Fix: vars declared in `VAR CONSTANT ... END_VAR` in the source .st.
    * Emitted as a separate `<localVars constant="true">` so CODESYS accepts
    * the name as a literal/symbolic integer constant in CASE labels (avoids
    * C0218 "CASE label requires literal or symbolic integer constant").
@@ -85,7 +85,7 @@ function getDateTime(): string {
 
 /**
  * Wrap ST code in CDATA section, escaping nested ]]> sequences.
- * Addresses F3-014: strip chars invalid in XML 1.0 (control chars except
+ * Strip chars invalid in XML 1.0 (control chars except
  * tab/newline/CR + lone surrogates) before wrapping CDATA. CDATA does not escape
  * those chars — they go raw to the CODESYS parser, which rejects them.
  */
@@ -109,7 +109,7 @@ function mapTypeToXml(type: string): string {
   if (simpleTypes[upper]) return simpleTypes[upper];
 
   // Array type: ARRAY[0..9] OF REAL  or  ARRAY[0..9, 0..9] OF INT (multi-dim)
-  // F3-023: accepts N dimensions separated by a comma.
+  // Accepts N dimensions separated by a comma.
   const arrayMatch = type.match(/^ARRAY\s*\[(.+?)\]\s*OF\s+(.+)$/i);
   if (arrayMatch) {
     const dimSpec = arrayMatch[1];
@@ -125,7 +125,7 @@ function mapTypeToXml(type: string): string {
       const innerType = mapTypeToXml(baseType);
       return `<array>${dims.join('')}<baseType>${innerType}</baseType></array>`;
     }
-    // D5-021: warns when a type looks like ARRAY but the dims are malformed — before
+    // Warns when a type looks like ARRAY but the dims are malformed — before
     // it silently fell into <derived name="ARRAY[..." /> which is valid XML
     // but semantically broken for the CODESYS importer. Stderr-only because
     // xml-builder is pure (no dependency on the structured logger).
@@ -190,7 +190,7 @@ function buildPouInterface(pou: PouDefinition): string {
   if (pou.outputVars && pou.outputVars.length > 0) sections.push(buildVarSection('outputVars', pou.outputVars));
   if (pou.inOutVars && pou.inOutVars.length > 0) sections.push(buildVarSection('inOutVars', pou.inOutVars));
   if (pou.localVars && pou.localVars.length > 0) sections.push(buildVarSection('localVars', pou.localVars));
-  // Bug D fix: emits VAR CONSTANT as a separate <localVars constant="true">
+  // Fix: emits VAR CONSTANT as a separate <localVars constant="true">
   if (pou.localConstantVars && pou.localConstantVars.length > 0) {
     sections.push(buildVarSection('localVars', pou.localConstantVars, ' constant="true"'));
   }
@@ -233,7 +233,7 @@ function buildDataTypeElement(dt: DataTypeDefinition, indent: string = '    '): 
     baseTypeContent = `<struct>\n${members}\n${indent}  </struct>`;
   }
 
-  // P2.0/A3: emit the {attribute 'qualified_only'} pragma as the CODESYS-native
+  // Emit the {attribute 'qualified_only'} pragma as the CODESYS-native
   // addData attribute block. Without it CODESYS imports the type unqualified and
   // reports "ambiguous use" for same-named enum members across types.
   const qualifiedOnlyAddData = dt.qualifiedOnly
@@ -258,7 +258,7 @@ ${indent}</dataType>`;
  * Used by both .st file generation and XML addData embedding.
  */
 export function buildGvlStCode(gvl: GvlDefinition): string {
-  // P2.0/A1: reflect all block modifiers so the ST round-trips faithfully.
+  // Reflect all block modifiers so the ST round-trips faithfully.
   // Canonical CODESYS order: VAR_GLOBAL [CONSTANT] [PERSISTENT] [RETAIN].
   let varKeyword = 'VAR_GLOBAL';
   if (gvl.isConstant) varKeyword += ' CONSTANT';
@@ -292,7 +292,7 @@ function buildGvlAddData(gvl: GvlDefinition, indent: string = '    '): string {
     return xml;
   }).join('\n');
 
-  // P2.0/A1: retain/persistent were silently dropped here — CODESYS then
+  // Retain/persistent were silently dropped here — CODESYS then
   // imported the GVL as a plain VAR_GLOBAL and persistence was lost on import.
   const gvlAttrs =
     (gvl.isConstant ? ' constant="true"' : '') +

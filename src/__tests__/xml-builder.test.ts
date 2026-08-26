@@ -207,7 +207,7 @@ describe('XML Builder — POU', () => {
     assert.ok(xml.includes('<derived name="TON" />'));
   });
 
-  it('emits address attribute for AT %-mapped vars (Bug A)', () => {
+  it('emits address attribute for AT %-mapped vars', () => {
     const pou: PouDefinition = {
       name: 'FB_IO',
       pouType: 'functionBlock',
@@ -287,7 +287,7 @@ describe('XML Builder — GVL', () => {
     assert.ok(xml.includes('constant="true"'));
   });
 
-  it('emits address attribute for AT %-mapped GVL vars (Bug A)', () => {
+  it('emits address attribute for AT %-mapped GVL vars', () => {
     const gvl: GvlDefinition = {
       name: 'GVL_IO',
       variables: [

@@ -92,7 +92,8 @@ Principle: **PATTERN · SYMMETRY · SIMPLICITY** — reading one signal teaches 
 1. **Exactly ONE `_`**, between Group and Signal. (The `_` in type tags `GVL_`/`FB_`/`E_` and
    scope prefixes `g_`/`c_` lives in the *type/scope* name — never in a signal name.)
 2. **One canonical Group token per owner** (the single writer). The same owner never appears
-   under two group names (no `Table`/`HeatPos`/`DonePos`; no `Tank`/`Preheat`/`TankHeater`).
+   under two group names — no `ConvIn`/`InFeed`/`BeltIn` for one infeed conveyor; no
+   `Pmp`/`PmpCtrl`/`CoolPmp` for one pump. Synonyms split the ownership the group token encodes.
 3. **No internal type prefix.** `bCfg_bHasX` → `bCfg_HasX`; `sCfg_sName` → `sCfg_Name`.
 4. **Nothing flat.** Every signal has a group; globals get a `Main`/`Sys` group.
 5. **Fault is a signal of the subsystem, never a group:** `bFault_X` → `bX_Fault`,
@@ -101,19 +102,23 @@ Principle: **PATTERN · SYMMETRY · SIMPLICITY** — reading one signal teaches 
 ```text
 ✅  bSafe_Ok   bConvIn_PartReady   bTable_Indexed   nMain_BlockReason   bHmiUser_DeleteBtn
 ❌  bManualMode (flat)            bFault_Table (fault as group)
-    bHmiConfig_bHasTable (inner prefix)   bHeatPos_PartReady (owner is Table)
+    bHmiConfig_bHasTable (inner prefix)   bBeltIn_PartReady (owner is ConvIn)
     bHmiConfigSaveBtn (missing group `_`)
 ```
 
 > **Physical-I/O GVL (`GVL_IO`) is exempt from grouping** — it is named by physical *direction*,
 > symmetric and IEC-aligned: `i` digital input (`AT %IX`), `q` digital output (`AT %QX`),
-> `n` analog word with a **mandatory direction suffix** — `Pv` input (`nTankTempPv`), `Sp` output
-> (`nGenPowerSp`). `i`/`q` mirror IEC 61131-3 `%I`/`%Q` (the standard uses `Q`, not `O`, because
-> `O`≈`0`). This replaces the old asymmetric `y`/`b` scheme (`b` was a *type* prefix, not a
-> direction). `GVL_IO` is the only GVL without `Group_` namespacing.
+> `n` analog word with a **mandatory direction suffix** — `Pv` input (`nTankLvlPv`), `Sp` output
+> (`nPmpSpdSp`). `i`/`q` mirror IEC 61131-3 `%I`/`%Q` (the standard uses `Q`, not `O`, because
+> `O`≈`0`). Prefer this over an asymmetric scheme that mixes a *direction* marker with a *type*
+> prefix (e.g. `y` for output against `b` for BOOL): the two axes then collide on one character,
+> and a name no longer tells you which axis it encodes. `GVL_IO` is the only GVL without
+> `Group_` namespacing.
 
-A lint gate (`test_lint_consistency.py`) enforces `^<type><Group>_<Signal>$` against a canonical
-group table and rejects flat names, multiple `_`, inner type prefixes, and faults-as-group.
+Mechanize the rule: a lint gate over the project's `.st` files that matches every bus/HMI signal
+against `^<type><Group>_<Signal>$` and a canonical group table, rejecting flat names, multiple
+`_`, inner type prefixes, and faults-as-group (`GVL_IO` exempt, per the note above). A convention
+nobody checks decays within a few POUs.
 
 ### Signal ownership — single writer, and where a shared sensor belongs
 

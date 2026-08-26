@@ -42,7 +42,7 @@ export function validateHungarianNotation(varName: string, typeName: string): Va
 /**
  * Validate a POU name has the correct prefix for its type.
  *
- * D5-011: case-insensitive lookup + tolerant of separators. Previously
+ * Case-insensitive lookup + tolerant of separators. Previously
  * `validatePouPrefix('FB','FunctionBlock')` silently returned
  * `valid:true` with the message "no prefix rule" — the validator swallowed
  * legitimate user variants.

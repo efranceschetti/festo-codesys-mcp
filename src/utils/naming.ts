@@ -18,7 +18,7 @@ const DUT_PREFIXES: Record<string, string> = {
  * Ensures a name starts with the required prefix.
  * Returns the (possibly corrected) name and whether it was corrected.
  *
- * D5-014: case-insensitive — before, `'fb_servoaxis'.startsWith('FB_')` was
+ * Case-insensitive — before, `'fb_servoaxis'.startsWith('FB_')` was
  * false and generated `'FB_fb_servoaxis'` (double prefix). Now it normalizes
  * to the canonical prefix in any case.
  */

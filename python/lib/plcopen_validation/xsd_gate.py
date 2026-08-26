@@ -59,7 +59,7 @@ def validate_xsd(
             errors=[ValidationError(None, str(xsd_to_use), "XSD_PARSE_ERROR", str(e))],
         )
 
-    # Parse the XML (may fail if the XML is malformed — severe Bug C)
+    # Parse the XML (may fail if the XML is malformed)
     try:
         tree = etree.parse(str(xml_path))
     except etree.XMLSyntaxError as e:

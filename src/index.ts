@@ -104,7 +104,7 @@ async function main() {
   // scripted client leaves an orphaned node process behind.
   process.stdin.on('end', () => process.exit(0));
   process.stdin.on('close', () => process.exit(0));
-  // D5-024: the structured logger emits both stderr and notifications/message.
+  // The structured logger emits both stderr and notifications/message.
   log('info', 'startup', `FestoCodesysMCP v${SERVER_VERSION} server running on stdio`);
 }
 

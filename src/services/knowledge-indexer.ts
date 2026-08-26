@@ -4,7 +4,7 @@
  * Indexes all markdown files in the knowledge/ directory using BM25.
  * Persists the index to JSON for fast startup.
  *
- * F3-020 / F3-021 (PENDING B3): all filesystem I/O is async (fs/promises).
+ * All filesystem I/O is async (fs/promises).
  * Constructor returns immediately; loadIndex() runs in background and
  * subsequent index/search calls await `ensureLoaded()` so the event loop is
  * never blocked by readFileSync/writeFileSync of the 1.1MB BM25 JSON.
@@ -138,7 +138,7 @@ export class KnowledgeIndexer {
   private queryCache = new QueryCache();
   private loadingPromise: Promise<void> | null;
   /**
-   * D5-003: parallel dedupe of index(). Without this, two simultaneous
+   * Parallel dedupe of index(). Without this, two simultaneous
    * `search()` calls before the first index completes would fire two
    * full passes in parallel, mutating `this.chunks` mid-flight and
    * passing inconsistent state to `bm25.fit()`.
@@ -177,7 +177,7 @@ export class KnowledgeIndexer {
 
   /** Index knowledge files. Incremental by default — only re-indexes changed files. */
   async index(force = false): Promise<{ docsCount: number; chunksCount: number; reindexed: number }> {
-    // D5-003: parallel dedupe. Reuses the in-flight promise if another call
+    // Parallel dedupe. Reuses the in-flight promise if another call
     // is already indexing (race when search() fires index() before the
     // boot main.index() completes).
     if (this.indexingPromise) return this.indexingPromise;
@@ -228,7 +228,7 @@ export class KnowledgeIndexer {
         }
         docsProcessed++;
       } catch (err) {
-        // D5-013: log skipped files (was a silent catch). Permission denied,
+        // Log skipped files (was a silent catch). Permission denied,
         // invalid encoding, etc. used to be invisible in production.
         log('warn', 'knowledge-indexer', `Skipped ${filepath}: ${err instanceof Error ? err.message : String(err)}`);
       }
@@ -291,7 +291,7 @@ export class KnowledgeIndexer {
 
   /**
    * Detects modified/new files AND deleted files (drift).
-   * F3-029: previously only new/modified — chunks of deleted files
+   * Previously only new/modified — chunks of deleted files
    * stayed orphaned in the index indefinitely, making search
    * return snippets of manuals that no longer exist.
    */

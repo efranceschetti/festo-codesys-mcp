@@ -34,8 +34,8 @@ import {
   fillTemplate,
 } from '../utils/codesys-python-templates.js';
 
-// Baseline lengths captured 2026-05-17 against the absorbed templates.
-// Re-baselined 2026-05-24 after the templates started emitting
+// Baseline lengths captured against the absorbed templates.
+// Re-baselined after the templates started emitting
 // SCRIPT_RESULT_JSON: payloads (GET_PROJECT_STRUCTURE, GET_POU_CODE) and
 // added 2 new templates (PATCH_POU_CODE, GET_DEVICE_TREE).
 // ±10% tolerance catches drift while tolerating small whitespace edits.

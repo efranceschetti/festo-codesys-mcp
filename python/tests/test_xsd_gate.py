@@ -26,7 +26,7 @@ def test_xml_inexistente_retorna_invalid() -> None:
 
 
 def test_xml_malformado_retorna_parse_error(tmp_path: Path) -> None:
-    """Simulated Bug C-severe: malformed tag."""
+    """Malformed tag: the XML does not parse at all."""
     bad = tmp_path / "broken.xml"
     bad.write_text("""<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
@@ -40,7 +40,7 @@ def test_xml_malformado_retorna_parse_error(tmp_path: Path) -> None:
 
 
 def test_xml_namespace_errado_retorna_xsd_violation(tmp_path: Path) -> None:
-    """Bug C-severe variant: namespace does not match the XSD."""
+    """Namespace does not match the XSD."""
     bad = tmp_path / "wrong_ns.xml"
     bad.write_text("""<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0999">
