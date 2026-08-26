@@ -227,7 +227,7 @@ END_PROGRAM"""})
 #
 # Everything else compares declarations. Change the logic without regenerating the XML
 # and all of it stays green while the XML being imported still carries the old algorithm
-# — which is the 2026-05-22 incident, 203 CODESYS errors from a stale master-final.xml.
+# — a stale export that validates clean offline and then fails to compile on import.
 
 
 def test_corpo_divergente_e_acusado(tmp_path: Path) -> None:
@@ -316,9 +316,9 @@ def test_semantic_source_dir_inexistente(tmp_path: Path) -> None:
 # ─────────────────────── comparison BY NAME (not by count) ────────────────
 #
 # Counting has a ceiling: a renamed or retyped variable keeps the count identical and
-# passes at ANY tolerance, 1.00 included. Measured on a real 27-POU project: renaming a
-# single variable inside one POU left the count at 62 → 62 and every count-based check
-# stayed green. These tests pin the by-name comparison that does catch it.
+# passes at ANY tolerance, 1.00 included. Measured: renaming a single variable inside one
+# POU leaves the count unchanged and every count-based check stays green.
+# These tests pin the by-name comparison that does catch it.
 
 
 def test_count_st_vars_coleta_os_nomes_declarados(tmp_path: Path) -> None:
@@ -379,8 +379,8 @@ END_PROGRAM"""})
 # ───────────────────── global variable lists (<globalVars>) ──────────────
 #
 # GVLs live in <globalVars> under <addData>, not in <pous>, so the POU loop never saw
-# them: on a real project that left 553 declarations unchecked — the HMI<->PLC contract
-# and the physical I/O map among them.
+# them: over a full project that leaves hundreds of declarations unchecked — the
+# HMI<->PLC contract and the physical I/O map among them.
 
 
 def _make_xml_with_gvl(tmp_path: Path, gvl_name: str, var_names: list[str]) -> Path:

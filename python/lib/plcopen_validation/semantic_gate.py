@@ -22,8 +22,8 @@ from .types import ValidationError, ValidationReport
 
 NS = "{http://www.plcopen.org/xml/tc6_0200}"
 
-# Tolerances were 0.75/0.70 — a 25%/30% slack that was never used: measured against a real
-# 27-POU project, ST and XML match 1:1 on every POU, so 1.00 costs zero red and removes room
+# Tolerances were 0.75/0.70 — a 25%/30% slack that was never used: measured over a full
+# project, ST and XML match 1:1 on every POU, so 1.00 costs zero red and removes room
 # for a real loss to hide in. Note the ceiling of what counting can do: renaming a variable
 # keeps the count identical and passes at ANY tolerance, 1.00 included — that is what the
 # by-name comparison below is for.
@@ -89,8 +89,8 @@ def count_st_vars(st_path: Path) -> dict[str, Any]:
         # Qualifiers COMBINE: `VAR_GLOBAL PERSISTENT RETAIN` is one block, and IEC 61131-3
         # allows several of them together. Accepting only one silently dropped the whole
         # block — and the variables that live there are the RETAIN ones, the state that
-        # survives a power cut. Measured on a real project: 13 variables invisible to the
-        # gate, including part counters and the table-slot tracking.
+        # survives a power cut. Measured: every declaration in such a block goes invisible
+        # to the gate, so the retained state is exactly what stops being checked.
         if re.match(r"^VAR(_\w+)?(\s+(CONSTANT|RETAIN|PERSISTENT|NON_RETAIN))*\s*$",
                     s, re.IGNORECASE):
             in_var_block = True
@@ -241,9 +241,10 @@ def validate_semantic(
     checked = 0
 
     # Global variable lists live in <globalVars> under <addData>, not in <pous> — so the
-    # POU loop below never saw them. On a real project that left 553 declarations
-    # unchecked, including the HMI<->PLC contract and the physical I/O map (73 vars, 62
-    # of them with an `AT %IX/%QX` address). Those are boundaries: exactly where a lost
+    # POU loop below never saw them. Over a full project that leaves hundreds of
+    # declarations unchecked — among them the HMI<->PLC contract and the physical I/O
+    # map, where most variables carry an `AT %IX/%QX` address. Those are boundaries:
+    # exactly where a lost
     # or renamed identifier stops raising an error and starts silently returning nothing.
     xml_gvls: dict[str, set[str]] = {}
     for el in xml_root.iter():
@@ -326,12 +327,12 @@ def validate_semantic(
             #
             # Everything above compares declarations. Change the logic without
             # regenerating the XML and all of it stays green, while the XML that gets
-            # imported still carries the old algorithm. That is not hypothetical: it is
-            # the 2026-05-22 incident, where a stale master-final.xml went in and produced
-            # 203 CODESYS errors.
+            # imported still carries the old algorithm. That is not hypothetical: a stale
+            # XML imported against changed sources produces a wall of compile errors in
+            # the IDE, and the offline gates stay green throughout.
             #
             # Comments and indentation are normalised away; line structure and case are
-            # NOT. Measured on a real 27-POU project, all 27 bodies match at this level —
+            # NOT. Measured over a full project, every body matches at this level —
             # the generator preserves them faithfully, so there is nothing to gain by
             # loosening further, and every loosening is logic the gate stops seeing.
             pou_el = xml_root.find(f'.//{NS}pou[@name="{pou_name}"]')

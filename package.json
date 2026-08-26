@@ -20,6 +20,7 @@
     "data/**/*.json",
     "knowledge/**/*",
     "!knowledge/bm25_index.json",
+    "!knowledge/external/**",
     "python/wrappers/**",
     "python/lib/**",
     "python/pyproject.toml",

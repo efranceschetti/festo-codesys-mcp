@@ -26,3 +26,9 @@ python/**/*.pyc
 
 # truST LSP index cache — regenerado pela extensao VS Code do truST ao abrir o repo.
 .trust-lsp/
+
+# Rede de seguranca: artefatos que nao existem hoje, mas que um build/lint futuro
+# geraria — melhor ignorados antes de aparecerem do que depois de commitados.
+dist/
+.ruff_cache/
+*.log

@@ -326,14 +326,14 @@ Detects bugs where the generator silently drops variables or initializers:
   - POU_MISSING_IN_XML  — POU declared in .st but absent in XML
 
 Use AFTER validate_plcopen_xsd. If XSD passes but semantic fails, the XML is
-structurally valid but missing content — exactly the silent-failure scenario
-that caused the 2026-05-22 incident (203 CODESYS errors).
+structurally valid but missing content — the silent-failure mode where a stale
+or truncated XML validates clean offline and then fails to compile on import.
 
 Tolerances are configurable; defaults are permissive (-25% vars, -30% inits).
 
 Output: { gate, valid, summary, errors[{line, location, code, message}], counts }`,
       inputSchema: {
-        filePath: z.string().min(1).describe('Path to PLCopen XML file (e.g. master-final.xml)'),
+        filePath: z.string().min(1).describe('Path to the PLCopen XML file to validate'),
         sourceDir: z.string().min(1).describe('Directory containing source .st files (recursive scan)'),
         varsTolerance: z.number().min(0).max(1).optional().describe('XML/ST var ratio threshold (default 0.75)'),
         initsTolerance: z.number().min(0).max(1).optional().describe('XML/ST init ratio threshold (default 0.70)'),
