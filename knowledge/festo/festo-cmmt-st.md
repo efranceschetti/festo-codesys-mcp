@@ -39,82 +39,217 @@ The CMMT-ST + EMMT-ST is a cost-effective stepper motion solution with servo-gra
 
 ### Motor Specifications
 
-| Flange | NEMA | Lengths | Holding Torque | Rated Output |
+Seven motors across three flange sizes. **Nominal speed ranges from 140 to 1000 rpm and
+is not predictable from size** — read the table, never infer from the flange.
+
+| Flange | NEMA | Lengths | Holding torque | Rated output |
 |--------|------|---------|----------------|--------------|
-| **42 mm** | NEMA 17 | S (Short), L (Long) | 0.25–0.63 Nm | 17–56 W |
-| **57 mm** | NEMA 23 | M (Medium), L (Long) | 1.12–1.86 Nm | 86–87 W |
+| **42 mm** | NEMA 17 | S, L | 0.25–0.63 Nm | 17–56 W |
+| **57 mm** | NEMA 23 | M, L | 1.12–1.86 Nm | 86–87 W |
 | **87 mm** | NEMA 34 | S, M, L | 2.4–9.4 Nm | 87–159 W |
+
+All variants: 2-phase hybrid, 48 V DC nominal, step angle 1.8° (full step) ±5%,
+50 pole pairs.
 
 #### EMMT-ST-42 (NEMA 17)
 
-| Parameter | 42-S (Short) | 42-L (Long) |
-|-----------|-------------|-------------|
-| **Nominal Voltage** | 48 V DC | 48 V DC |
-| **Nominal Current** | 1.8 A | 3.4 A |
-| **Peak Current** | 2 A | 4 A |
-| **Holding Torque** | 0.25 Nm | 0.63 Nm |
-| **Nominal Torque** | 0.24 Nm | 0.54 Nm |
-| **Nominal Speed** | 600 rpm | 1000 rpm |
-| **Max Speed** | 2700 rpm | 3200 rpm |
-| **Rated Output** | 17 W | 56 W |
+| Parameter | 42-S | 42-L |
+|-----------|------|------|
+| **Nominal torque** | 0.24 Nm | 0.54 Nm |
+| **Nominal speed** | 600 rpm | 1000 rpm |
+| **Max speed** | 2700 rpm | 3200 rpm |
+| **Rated output** | 17 W | 56 W |
+| Holding torque | 0.25 Nm | 0.63 Nm |
+| Peak torque | 0.25 Nm | 0.63 Nm |
+| Nominal current | 1.8 A | 3.4 A |
+| Continuous stall current | 2 A | 3.7 A |
+| Peak current | 2 A | 4 A |
+| Motor constant | 0.133 Nm/A | 0.162 Nm/A |
+| Phase resistance / inductance | 2.1 Ω / 0.3 mH | 0.6 Ω / 0.8 mH |
+| Thermal time constant | 22 min | 16 min |
+| Thermal resistance | 3.5 K/W | 2 K/W |
+| Max mechanical speed | 9000 rpm | 9000 rpm |
+
+Axial / radial shaft load: 10 N / 28 N. Measuring flange 200 × 200 × 15 mm steel.
 
 #### EMMT-ST-57 (NEMA 23)
 
-| Parameter | 57-M (Medium) | 57-L (Long) |
-|-----------|-------------|-------------|
-| **Nominal Voltage** | 48 V DC | 48 V DC |
-| **Nominal Current** | 5.4 A | 5.2 A |
-| **Peak Current** | 8 A | 8 A |
-| **Holding Torque** | 1.12 Nm | 1.86 Nm |
-| **Nominal Torque** | 0.83 Nm | 1.64 Nm |
-| **Nominal Speed** | 1000 rpm | 500 rpm |
-| **Max Speed** | 2600 rpm | 1500 rpm |
-| **Rated Output** | 87 W | 86 W |
+| Parameter | 57-M | 57-L |
+|-----------|------|------|
+| **Nominal torque** | 0.83 Nm | 1.64 Nm |
+| **Nominal speed** | 1000 rpm | 500 rpm |
+| **Max speed** | 2600 rpm | 1500 rpm |
+| **Rated output** | 87 W | 86 W |
+| Holding torque | 1.12 Nm | 1.86 Nm |
+| Peak torque | 1.1 Nm | 2.1 Nm |
+| Nominal current | 5.4 A | 5.2 A |
+| Continuous stall current | 6.6 A | 6.1 A |
+| Peak current | 8 A | 8 A |
+| Motor constant | 0.152 Nm/A | 0.32 Nm/A |
+| Phase resistance / inductance | 0.17 Ω / 0.5 mH | 0.26 Ω / 0.95 mH |
+| Thermal time constant | 27 min | 30 min |
+| Thermal resistance | 1.6 K/W | 1.3 K/W |
+| Max mechanical speed | 8000 rpm | 8000 rpm |
+
+Axial / radial shaft load: 15 N / 75 N. Measuring flange 200 × 200 × 15 mm steel.
 
 #### EMMT-ST-87 (NEMA 34)
 
-| Parameter | 87-S (Short) | 87-M (Medium) | 87-L (Long) |
-|-----------|-------------|-------------|-------------|
-| **Nominal Voltage** | 48 V DC | 48 V DC | 48 V DC |
-| **Nominal Current** | 7.8 A | 7.5 A | 8.4 A |
-| **Peak Current** | 12 A | 10 A | — |
-| **Holding Torque** | 2.4 Nm | 6.6 Nm | 9.4 Nm |
-| **Nominal Speed** | — | — | — |
-| **Rated Output** | 159 W | 87 W | 126 W |
+| Parameter | 87-S | 87-M | 87-L |
+|-----------|------|------|------|
+| **Nominal torque** | 1.9 Nm | 5.9 Nm | 8.4 Nm |
+| **Nominal speed** | **800 rpm** | **140 rpm** | **140 rpm** |
+| **Max speed** | **2200 rpm** | **600 rpm** | **430 rpm** |
+| **Rated output** | 159 W | 87 W | 126 W |
+| Holding torque | 2.4 Nm | 6.6 Nm | 9.4 Nm |
+| Peak torque | 2.7 Nm | 6.8 Nm | 9.4 Nm |
+| Nominal current | 7.8 A | 7.5 A | 8.4 A |
+| Continuous stall current | 9.5 A | 8.2 A | 10 A |
+| Peak current | 12 A | 12 A | 10 A |
+| Motor constant | 0.24 Nm/A | 0.79 Nm/A | 1.06 Nm/A |
+| Phase resistance / inductance | 0.13 Ω / 0.35 mH | 0.27 Ω / 2.3 mH | 0.3 Ω / 2.7 mH |
+| Thermal time constant | 35 min | 32 min | 37 min |
+| Thermal resistance | 0.89 K/W | 0.83 K/W | 0.75 K/W |
+| Max mechanical speed | 7000 rpm | 7000 rpm | 7000 rpm |
 
-All variants: Step angle 1.8° (full step), ±5% tolerance.
+Axial / radial shaft load: 60 N / 220 N. Measuring flange **250 × 250 × 15 mm** steel.
+
+### Selection traps
+
+🚨 **1. Holding torque is a standstill number — size by nominal speed.** The 87-L holds
+9.4 Nm but its nominal speed is **140 rpm** and it stops at **430 rpm**. Above nominal the
+torque falls away steeply (see the M/n curves in catalogue 203023, pp. 11–13).
+
+🚨 **2. Biggest torque is not biggest power.** The 87-L (9.4 Nm holding) is a **126 W**
+motor; the 87-**S** (2.4 Nm) is **159 W** — the most powerful in the range — because it
+turns at 800 rpm instead of 140. Pick by the torque-speed point the application needs, not
+by the headline torque.
+
+🚨 **3. No overload reserve.** Peak torque sits barely above nominal (87-L: 9.4 vs
+8.4 Nm), where a servo delivers about 3x for seconds. Inertia-heavy starts belong on
+EMMT-AS + CMMT-AS.
+
+🚨 **4. Supply 48 V, not 24 V.** The CMMT-ST accepts 24–48 V DC and the catalogue
+curves plot peak torque separately for each: the 48 V curve holds torque to markedly higher
+speed. Running 24 V silently costs speed range.
+
+🚨 **5. Two derating traps that invalidate every figure above:**
+- **Above 40 °C ambient: −2 %/°C**, up to 80 °C. At 60 °C that is **−40 % torque**.
+  Relevant near furnaces, induction heaters or closed panels.
+- Continuous ratings assume the motor bolted to the **measuring flange** listed per size
+  (a steel plate acting as heatsink). Mounted on anything smaller, derate.
 
 ### Encoder Options
 
-| Parameter | Single-Turn [S] | Multi-Turn [M] |
+| Parameter | Single-turn [S] | Multi-turn [M] |
 |-----------|----------------|----------------|
-| **Measuring Principle** | Magnetic | Magnetic |
+| **Measuring principle** | Magnetic | Magnetic |
 | **Interface** | BiSS-C | BiSS-C |
-| **Detectable Revolutions** | 1 | 65,536 |
+| **Detectable revolutions** | 1 | 65,536 |
+| **Positions per revolution** | 65,536 | 131,072 |
+| **Resolution** | 16 bit | 17 bit |
+| **System accuracy** | ±540 arcsec | ±310 arcsec |
+| **Max operating speed** | 5500 rpm | 12,000 rpm |
+| **Supply — 42 mm** | 5 V (4.75–5.25 V) | 5 V (4.5–5.5 V) |
+| **Supply — 57 / 87 mm** | 5 V (4.75–5.25 V) | 14 V (4.75–15 V) |
+| **MTTF** | 106 years | 20 years |
 | **Battery** | None (battery-free) | None (battery-free) |
-| **Voltage (42mm)** | 5 V (4.75–5.25 V) | 14 V (4.5–5.5 V) |
-| **Voltage (57/87mm)** | 5 V (4.75–5.25 V) | 14 V (4.75–15 V) |
 
-**Key advantage**: Absolute multi-turn encoder eliminates the need for homing after power cycle.
+Encoder temperature range −40…105 °C. **Key advantage**: the multi-turn absolute encoder
+eliminates homing after a power cycle.
+
+### Holding Brake (`-B` variants)
+
+| Parameter | 42 | 57 | 87 |
+|-----------|----|----|----|
+| **Brake holding torque** | 0.63 Nm | 1.74 Nm | 4.26 Nm |
+| Current / power (24 V DC) | 0.34 A / 8.2 W | 0.38 A / 9 W | 0.49 A / 12 W |
+| Coil resistance | 70.9 Ω | 63.8 Ω | 49.2 Ω |
+| Separation (release) time | 28 ms | 32 ms | 44 ms |
+| Closing time | 41 ms | 97 ms | 110 ms |
+| DC response delay | 8 ms | 11 ms | 30 ms |
+| Max friction per braking | 1500 J | 6000 J | 14,000 J |
+| Brake inertia | 0.006 kgcm² | 0.024 kgcm² | 0.11 kgcm² |
+
+🚨 **On the 87-M and 87-L the brake holds LESS than the motor's nominal torque**
+(4.26 Nm vs 5.9 / 8.4 Nm) — it cannot hold a fully loaded shaft. On every other size the
+brake exceeds nominal torque. Check this per model; it is not a property of the range.
+
+🚨 **Rated for 1 emergency stop per hour.** It is a holding brake, not a stopping
+brake — the operating instructions (8225627, §3.3) say so explicitly. For safety stops use
+the drive STO/SS1-t. The 10-million-cycle figure is for **idle** actuation, no friction work.
+
+### Dimensions and Weight
+
+| Size | Shaft ø (D1, h6) | Bolt circle (B3) | Flange (B1) | Pilot ø (D3, h8) | Height H1 |
+|------|------------------|------------------|-------------|------------------|-----------|
+| **42** | **5 mm** | 31 mm | 42 mm | 22 mm | 73.3 mm |
+| **57** | **6.35 mm** | 47.1 mm | 56.4 mm | 38.1 mm | 88 mm |
+| **87** | **11 mm** | 69.5 mm | 85.9 mm | 73 mm | 118 mm |
+
+⚠️ **The 87 shaft is 11 mm, not the 14 mm a generic NEMA 34 gearbox expects.** Any
+coupling or planetary gearbox must be ordered for the actual shaft — check before pairing
+with a gear unit specified for another motor family.
+
+Connector on all sizes: M17. Overall length L1 (without / with brake): 42-S 94/124,
+42-L 112/142, 57-M 110.1/138.6, 57-L 131.1/159.6, 87-S 121/149.5, 87-M 154.5/183,
+87-L 184.5/213 mm.
+
+| Weight [g] | None | With brake |
+|------------|------|-----------|
+| 42-S | 370 | 590 |
+| 42-L | 560 | 770 |
+| 57-M | 900 | 1300 |
+| 57-L | 1260 | 1660 |
+| 87-S | 2050 | 2890 |
+| 87-M | 3490 | 4320 |
+| 87-L | 4660 | 5490 |
+
+Total output inertia (multi-turn encoder, with brake): 42-S 0.043, 42-L 0.09, 57-M 0.33,
+57-L 0.51, 87-S 1.116, 87-M 2.016, 87-L 3.116 kgcm².
+
+### Environmental
+
+| Parameter | Value |
+|-----------|-------|
+| **Degree of protection** | **IP40 at the shaft**, IP65 motor housing incl. connection system |
+| **Ambient temperature** | −15…40 °C (42-S: 0…40 °C); to 80 °C with −2 %/°C derating |
+| Storage temperature | −20…70 °C |
+| Max winding temperature | 130 °C (temperature class B) |
+| Rating class (EN 60034-1) | S1 (continuous) |
+| Mounting (EN 60034-7) | IM B5, IM V1, IM V3 — any orientation |
+| Temperature monitoring | Digital, via BiSS-C (encoder variants only) |
+| Relative humidity | 0–90 %, non-condensing |
+| Approvals | UL E342973 (c UL us, Recognised), RCM, CE, UKCA |
+| LABS (PWIS) | VDMA24364 zone III |
+
+> **Source for this whole section:** Festo catalogue **203023** (2026/06), datasheet pages
+> 4–14, cross-checked against the product datasheet for EMMT-ST-87-L-RMB (part 8156202,
+> retrieved 2026-08-27) and operating instructions **8225627** (2024-10a). The torque/speed
+> curves live in the catalogue, pp. 11–13; they are not reproduced here.
 
 ### Motor Features
 
 - **OCP** (One Cable Plug): Single cable for power + encoder signals
-- **Swivel connector**: 310° rotatable for flexible cable routing
-- **Protection**: IP65 — suitable for harsh production environments
+- **Swivel connector**: 290° rotatable for flexible cable routing
+- **Protection**: **IP40 at the shaft**, IP65 motor housing incl. connection system
 - **Certification**: UL certified
 
 ### Motor Part Number Scheme
 
 ```
-EMMT-ST-[flange]-[length]-[encoder]-[brake]
-          │         │        │         │
-          │         │        │         └─ B = with holding brake
-          │         │        └─────────── S = single-turn, M = multi-turn, R = resolver
-          │         └──────────────────── S = short, L = long, M = medium
-          └────────────────────────────── 42, 57, 87 (mm flange size)
+EMMT-ST-[flange]-[length]-[connection][encoder][brake]
+          │         │         │           │       │
+          │         │         │           │       └─ B = holding brake (omit = none)
+          │         │         │           └─────── M = multi-turn abs., S = single-turn abs. (omit = none)
+          │         │         └─────────────────── R = angled connector, adjustable
+          │         └───────────────────────────── S = short, M = medium, L = long
+          └─────────────────────────────────────── 42, 57, 87 (mm flange size)
 
-Example: EMMT-ST-57-M-RMB = 57mm, medium, multi-turn encoder, brake
+Example: EMMT-ST-87-L-RMB = 87 mm flange, long, angled connector, multi-turn encoder, brake
+Per Festo type code (catalogue 203023): fields 005/006/007 are connection, measuring
+unit, brake. **There is no resolver option** — the measuring unit is absolute
+(single- or multi-turn) or none.
 ```
 
 ### Motor Part Number Suffix Table
@@ -164,6 +299,13 @@ Cable: NEBM-M17G12-EH series (OCP, M17 connector, 0.5–25 m)
 | CMMT-ST-C8-1C-**EP**-S0 | EtherNet/IP |
 | CMMT-ST-C8-1C-**PN**-S0 | PROFINET |
 | CMMT-ST-C8-1C-**MP**-S0 | Multi-Protocol (all of above + Modbus TCP) |
+
+🚨 **Closed-loop ("Servo-Light") requires the `-MP` variant.** The EMMT-ST operating
+instructions (8225627, §5.2) state it plainly: *"'Servo-Light' operation (closed loop
+control) is available in combination with the servo drive CMMT-ST-MP."* Pairing an
+encoder-equipped EMMT-ST with a non-MP drive gives absolute homing but **open-loop**
+motion — you pay for the encoder and do not get closed-loop control. Check the suffix
+on the order.
 
 ### CiA 402 Operating Modes
 
