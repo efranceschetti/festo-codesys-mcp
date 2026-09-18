@@ -37,6 +37,7 @@
     "start": "node build/index.js",
     "dev": "tsx src/index.ts",
     "prepare": "npm run build",
+    "pretest": "npm run build",
     "test": "node --test build/__tests__/*.test.js",
     "test:coverage": "c8 --reporter=text --reporter=lcov node --test build/__tests__/*.test.js",
     "test:bench": "node scripts/bench.mjs",
